@@ -683,7 +683,59 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-#threejs-container { position: relative; }</style>
+#threejs-container { position: relative; }
+/* Layout compression */
+header, .navbar {
+    padding: 0.5rem 1rem !important;
+    height: 60px !important;
+}
+.kpi-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.kpi-card {
+    flex: 1 1 48%;
+    margin-bottom: 0.5rem;
+    padding: 0.75rem 1rem;
+}
+.sidebar-card {
+    padding: 0.75rem 1rem !important;
+    margin-top: 0.5rem !important;
+}
+#threejs-container {
+    height: 400px !important;
+    margin-top: 0.75rem;
+}
+.main-container {
+    padding-top: 1rem !important;
+}
+
+/* Final compression adjustments */
+#threejs-container {
+    height: 320px !important;
+}
+.kpi-card .kpi-value {
+    font-size: 1.8rem !important;
+}
+.kpi-card .card-title {
+    font-size: 1rem !important;
+    margin-bottom: 0.25rem !important;
+}
+.kpi-card {
+    padding: 0.5rem 0.75rem !important;
+}
+.sidebar-card {
+    padding: 0.5rem 0.75rem !important;
+}
+.main-container {
+    padding-top: 0.5rem !important;
+}
+header, .navbar {
+    padding: 0.25rem 1rem !important;
+    min-height: 48px !important;
+}
+</style>
 </head>
 <body>
 <div class="loading-overlay" id="loadingOverlay">
@@ -1516,7 +1568,8 @@
 
             // Camera setup
             camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(0, 20, 40);
+            camera.position.set(0, 15, 30);
+    camera.lookAt(new THREE.Vector3(0, 5, 5));
 
             // Renderer setup
             renderer = new THREE.WebGLRenderer({ 
@@ -1741,7 +1794,8 @@
         }
 
         function resetCamera() {
-            camera.position.set(0, 20, 40);
+            camera.position.set(0, 15, 30);
+    camera.lookAt(new THREE.Vector3(0, 5, 5));
             camera.lookAt(0, 0, 0);
         }
 
@@ -1886,7 +1940,8 @@ function initializeThreeJS() {
 
     // Camera setup
     camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.set(0, 20, 40);
+    camera.position.set(0, 15, 30);
+    camera.lookAt(new THREE.Vector3(0, 5, 5));
 
     // Renderer setup
     renderer = new THREE.WebGLRenderer({ 
