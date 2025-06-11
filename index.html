@@ -41,19 +41,19 @@
             gap: 16px;
         }
 
-        .logo-mark {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 16px;
-            color: white;
-            letter-spacing: -0.5px;
+        /* --- MODIFIED CSS FOR THE LOGO IMAGE --- */
+        .securefood-logo { /* New class name for the img tag */
+            width: 44px; /* Set the desired width for your logo */
+            height: 44px; /* Set the desired height for your logo */
+            display: block; /* Ensures the image behaves as a block element */
+            /* If your PNG is square and fits well, no other background styles are needed here */
         }
+
+        /* --- HIDE THE OLD LOGO MARK --- */
+        .logo-mark { /* This will hide the original "SF" div */
+            display: none;
+        }
+        /* --- END MODIFIED CSS --- */
 
         .platform-title {
             color: #111827;
@@ -689,8 +689,7 @@
 
     <header class="platform-header">
         <div class="platform-logo">
-            <img src="securefood-logo.png" alt="Company Logo" class="logo-mark-image">
-            <div class="logo-mark">SF</div>
+            <img src="securefood-logo.png" alt="Company Logo" class="securefood-logo">
             <div>
                 <h1 class="platform-title">SecureFood Digital Twin Platform</h1>
                 <p class="platform-subtitle">IRIS Technology Solutions | Enterprise Food System Intelligence</p>
@@ -721,7 +720,6 @@
             </button>
         </nav>
 
-        <!-- Dashboard Tab -->
         <div id="dashboard" class="tab-content active">
             <div class="dashboard-grid">
                 <div class="main-content">
@@ -819,7 +817,6 @@
             </div>
         </div>
 
-        <!-- Analytics Tab -->
         <div id="analytics" class="tab-content">
             <div class="analytics-layout">
                 <div class="chart-card">
@@ -849,7 +846,6 @@
             </div>
         </div>
 
-        <!-- Alerts Tab -->
         <div id="alerts" class="tab-content">
             <div class="alerts-layout">
                 <div class="alerts-list">
@@ -858,8 +854,7 @@
                         <span class="alert-count" id="alertCount">3</span>
                     </div>
                     <div id="alertsContainer">
-                        <!-- Alerts will be populated by JavaScript -->
-                    </div>
+                        </div>
                 </div>
                 <div class="sidebar-card">
                     <h3 class="sidebar-title">Alert Filters</h3>
@@ -886,7 +881,6 @@
             </div>
         </div>
 
-        <!-- Settings Tab -->
         <div id="settings" class="tab-content">
             <div class="settings-layout">
                 <div class="settings-nav">
