@@ -1,13 +1,14 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecureFood Digital Twin Platform | IRIS Technology Solutions</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SecureFood Digital Twin Platform | IRIS Technology Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -674,245 +675,235 @@
     </style>
 </head>
 <body>
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <div class="spinner"></div>
-            <h3>Initializing Digital Twin Platform</h3>
-            <p>Synchronizing real-time data streams...</p>
-        </div>
-    </div>
-
-    <header class="platform-header">
-        <div class="platform-logo">
-            <img src="securefood-logo.png" alt="SecureFood Logo" class="full-logo-image">
-            <div>
-                <h1 class="platform-title">SecureFood Digital Twin Platform</h1>
-                <p class="platform-subtitle">IRIS Technology Solutions | Enterprise Food System Intelligence</p>
-            </div>
-        </div>
-        <div class="header-controls">
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <span>System Operational</span>
-            </div>
-            <button class="btn-primary" onclick="exportReport()">Export Report</button>
-        </div>
-    </header>
-
-    <div class="main-container">
-        <nav class="tab-navigation">
-            <button class="tab-button active" onclick="switchTab(event, 'dashboard')">
+<div class="loading-overlay" id="loadingOverlay">
+<div class="loading-content">
+<div class="spinner"></div>
+<h3>Initializing Digital Twin Platform</h3>
+<p>Synchronizing real-time data streams...</p>
+</div>
+</div>
+<header class="platform-header">
+<div class="platform-logo">
+<img alt="SecureFood Logo" class="full-logo-image" src="securefood-logo.png"/>
+<div>
+<h1 class="platform-title">SecureFood Digital Twin Platform</h1>
+<p class="platform-subtitle">IRIS Technology Solutions | Enterprise Food System Intelligence</p>
+</div>
+</div>
+<div class="header-controls">
+<div class="status-indicator">
+<div class="status-dot"></div>
+<span>System Operational</span>
+</div>
+<button class="btn-primary" onclick="exportReport()">Export Report</button>
+</div>
+</header>
+<div class="main-container">
+<nav class="tab-navigation">
+<button class="tab-button active" onclick="switchTab(event, 'dashboard')">
                 Dashboard
             </button>
-            <button class="tab-button" onclick="switchTab(event, 'analytics')">
+<button class="tab-button" onclick="switchTab(event, 'analytics')">
                 Analytics
             </button>
-            <button class="tab-button" onclick="switchTab(event, 'alerts')">
+<button class="tab-button" onclick="switchTab(event, 'alerts')">
                 Alerts
             </button>
-            <button class="tab-button" onclick="switchTab(event, 'settings')">
+<button class="tab-button" onclick="switchTab(event, 'settings')">
                 Settings
             </button>
-        </nav>
-
-        <div id="dashboard" class="tab-content active">
-            <div class="dashboard-grid">
-                <div class="main-content">
-                    <div class="kpi-grid">
-                        <div class="kpi-card">
-                            <div class="kpi-title">Supply Chain Efficiency</div>
-                            <div class="kpi-value" id="efficiency-metric">94.2%</div>
-                            <div class="kpi-change change-positive">
+</nav>
+<div class="tab-content active" id="dashboard">
+<div class="dashboard-grid">
+<div class="main-content">
+<div class="kpi-grid">
+<div class="kpi-card">
+<div class="kpi-title">Supply Chain Efficiency</div>
+<div class="kpi-value" id="efficiency-metric">94.2%</div>
+<div class="kpi-change change-positive">
                                 ↗ +2.1% vs. last month
                             </div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-title">Risk Assessment Score</div>
-                            <div class="kpi-value" id="risk-metric">7.3</div>
-                            <div class="kpi-change change-positive">
+</div>
+<div class="kpi-card">
+<div class="kpi-title">Risk Assessment Score</div>
+<div class="kpi-value" id="risk-metric">7.4 (Moderate Risk)</div>
+<div class="kpi-change change-positive">
                                 ↗ +0.4 (Lower risk)
                             </div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-title">Predictive Accuracy</div>
-                            <div class="kpi-value" id="prediction-metric">91.8%</div>
-                            <div class="kpi-change change-positive">
+</div>
+<div class="kpi-card">
+<div class="kpi-title">Predictive Accuracy</div>
+<div class="kpi-value" id="prediction-metric">91.8%</div>
+<div class="kpi-change change-positive">
                                 ↗ +1.2% model improvement
                             </div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-title">Cost Optimization</div>
-                            <div class="kpi-value" id="cost-metric">€2.4M</div>
-                            <div class="kpi-change change-positive">
+</div>
+<div class="kpi-card">
+<div class="kpi-title">Cost Optimization</div>
+<div class="kpi-value" id="cost-metric">€2.4M</div>
+<div class="kpi-change change-positive">
                                 ↗ €340K saved this quarter
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="digital-twin-viewer">
-                        <div class="viewer-header">
-                            <div class="viewer-title">Digital Twin Visualization - Supply Chain Network</div>
-                            <div class="viewer-controls">
-                                <button class="viewer-btn active" onclick="setViewMode('network')">Network</button>
-                                <button class="viewer-btn" onclick="setViewMode('flow')">Flow</button>
-                                <button class="viewer-btn" onclick="setViewMode('risk')">Risk</button>
-                                <button class="viewer-btn" onclick="resetCamera()">Reset</button>
-                            </div>
-                        </div>
-                        <div id="threejs-container"></div>
-                    </div>
-                </div>
-
-                <div class="sidebar">
-                    <div class="sidebar-card">
-                        <h3 class="sidebar-title">System Metrics</h3>
-                        <div class="metric-item">
-                            <div class="metric-label">Data Accuracy</div>
-                            <div class="metric-value">99.7%</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Sync Latency</div>
-                            <div class="metric-value">23ms</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Active Sensors</div>
-                            <div class="metric-value">1,247</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">System Load</div>
-                            <div class="metric-value">34%</div>
-                        </div>
-                    </div>
-
-                    <div class="sidebar-card">
-                        <h3 class="sidebar-title">Supply Chain Controls</h3>
-                        <div class="control-section">
-                            <label class="control-label">Active Supply Chain</label>
-                            <select class="control-select" id="chainSelector" onchange="switchSupplyChain()">
-                                <option value="grain">Ukrainian Grain Network</option>
-                                <option value="dairy">EU Dairy Systems</option>
-                                <option value="fish">Mediterranean Aquaculture</option>
-                                <option value="produce">Iberian Fresh Produce</option>
-                            </select>
-                        </div>
-                        <div class="control-section">
-                            <label class="control-label">Analysis Mode</label>
-                            <select class="control-select" id="analysisMode">
-                                <option value="realtime">Real-time Monitoring</option>
-                                <option value="predictive">Predictive Analysis</option>
-                                <option value="historical">Historical Trends</option>
-                                <option value="stress">Stress Testing</option>
-                            </select>
-                        </div>
-                        <button class="btn-secondary" onclick="runAnalysis()">Execute Analysis</button>
-                        <button class="btn-secondary" onclick="runSimulation()">Run Scenario</button>
-                        <button class="btn-secondary" onclick="generateInsights()">AI Insights</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="analytics" class="tab-content">
-            <div class="analytics-layout">
-                <div class="chart-card">
-                    <div class="chart-title">Real-time Performance Metrics</div>
-                    <div class="chart-container">
-                        <canvas id="performanceChart"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title">Risk Assessment Distribution</div>
-                    <div class="chart-container">
-                        <canvas id="riskChart"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title">Supply Chain Throughput</div>
-                    <div class="chart-container">
-                        <canvas id="throughputChart"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-title">Cost Optimization Trends</div>
-                    <div class="chart-container">
-                        <canvas id="costChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="alerts" class="tab-content">
-            <div class="alerts-layout">
-                <div class="alerts-list">
-                    <div class="alerts-header">
-                        <h3 class="alerts-title">System Alerts & Recommendations</h3>
-                        <span class="alert-count" id="alertCount">3</span>
-                    </div>
-                    <div id="alertsContainer">
-                        </div>
-                </div>
-                <div class="sidebar-card">
-                    <h3 class="sidebar-title">Alert Filters</h3>
-                    <div class="control-section">
-                        <label class="control-label">Severity</label>
-                        <select class="control-select">
-                            <option value="all">All Levels</option>
-                            <option value="critical">Critical Only</option>
-                            <option value="warning">Warning & Above</option>
-                        </select>
-                    </div>
-                    <div class="control-section">
-                        <label class="control-label">Category</label>
-                        <select class="control-select">
-                            <option value="all">All Categories</option>
-                            <option value="performance">Performance</option>
-                            <option value="security">Security</option>
-                            <option value="maintenance">Maintenance</option>
-                        </select>
-                    </div>
-                    <button class="btn-secondary" onclick="clearAlerts()">Clear All Alerts</button>
-                    <button class="btn-secondary" onclick="exportAlerts()">Export Alerts</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="settings" class="tab-content">
-            <div class="settings-layout">
-                <div class="settings-nav">
-                    <div class="settings-nav-item active" onclick="switchSettingsTab(event, 'general')">General</div>
-                    <div class="settings-nav-item" onclick="switchSettingsTab(event, 'integration')">Integration</div>
-                    <div class="settings-nav-item" onclick="switchSettingsTab(event, 'notifications')">Notifications</div>
-                    <div class="settings-nav-item" onclick="switchSettingsTab(event, 'security')">Security</div>
-                    <div class="settings-nav-item" onclick="switchSettingsTab(event, 'advanced')">Advanced</div>
-                </div>
-                <div class="settings-content" id="settingsContent">
-                    <div class="settings-section">
-                        <h3 class="settings-section-title">General Configuration</h3>
-                        <div class="form-group">
-                            <label class="form-label">Platform Name</label>
-                            <input type="text" class="form-input" value="SecureFood Digital Twin Platform">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Default Supply Chain</label>
-                            <select class="form-input">
-                                <option>Ukrainian Grain Network</option>
-                                <option>EU Dairy Systems</option>
-                                <option>Mediterranean Aquaculture</option>
-                                <option>Iberian Fresh Produce</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Refresh Interval (seconds)</label>
-                            <input type="number" class="form-input" value="5">
-                        </div>
-                        <button class="btn-primary">Save Changes</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
+</div>
+</div>
+<div class="digital-twin-viewer">
+<div class="viewer-header">
+<div class="viewer-title">Digital Twin Visualization - Supply Chain Network</div>
+<div class="viewer-controls">
+<button class="viewer-btn active" onclick="setViewMode('network')">Network</button>
+<button class="viewer-btn" onclick="setViewMode('flow')">Flow</button>
+<button class="viewer-btn" onclick="setViewMode('risk')">Risk</button>
+<button class="viewer-btn" onclick="resetCamera()">Reset</button>
+</div>
+</div>
+<div id="threejs-container"></div>
+</div>
+</div>
+<div class="sidebar">
+<div class="sidebar-card">
+<h3 class="sidebar-title">System Metrics</h3>
+<div class="metric-item">
+<div class="metric-label">Data Accuracy</div>
+<div class="metric-value">99.7%</div>
+</div>
+<div class="metric-item">
+<div class="metric-label">Sync Latency</div>
+<div class="metric-value">23ms</div>
+</div>
+<div class="metric-item">
+<div class="metric-label">Active Sensors</div>
+<div class="metric-value">1,247</div>
+</div>
+<div class="metric-item">
+<div class="metric-label">System Load</div>
+<div class="metric-value">34%</div>
+</div>
+</div>
+<div class="sidebar-card">
+<h3 class="sidebar-title">Supply Chain Controls</h3><div class="control-section"><label class="control-label">Date Range</label><input class="control-select" id="dateStart" type="date"/><input class="control-select" id="dateEnd" style="margin-top: 8px;" type="date"/></div>
+<div class="control-section">
+<label class="control-label">Active Supply Chain</label>
+<select class="control-select" id="chainSelector" onchange="switchSupplyChain()">
+<option value="grain">Ukrainian Grain Network</option>
+<option value="dairy">EU Dairy Systems</option>
+<option value="fish">Mediterranean Aquaculture</option>
+<option value="produce">Iberian Fresh Produce</option>
+</select>
+</div>
+<div class="control-section">
+<label class="control-label">Analysis Mode</label>
+<select class="control-select" id="analysisMode">
+<option value="realtime">Real-time Monitoring</option>
+<option value="predictive">Predictive Analysis</option>
+<option value="historical">Historical Trends</option>
+<option value="stress">Stress Testing</option>
+</select>
+</div>
+<button class="btn-secondary" onclick="runAnalysis()" title="Run a real-time performance evaluation across nodes.">Execute Analysis</button>
+<button class="btn-secondary" onclick="runSimulation()" title="Simulate stress conditions or alternative routing.">Run Scenario</button>
+<button class="btn-secondary" onclick="generateInsights()" title="Generate AI-driven recommendations based on system data.">AI Insights</button>
+</div>
+</div>
+</div>
+</div>
+<div class="tab-content" id="analytics">
+<div class="analytics-layout">
+<div class="chart-card">
+<div class="chart-title">Real-time Performance Metrics</div>
+<div class="chart-container">
+<canvas id="performanceChart"></canvas>
+</div>
+</div>
+<div class="chart-card">
+<div class="chart-title">Risk Assessment Distribution</div>
+<div class="chart-container">
+<canvas id="riskChart"></canvas>
+</div>
+</div>
+<div class="chart-card">
+<div class="chart-title">Supply Chain Throughput</div>
+<div class="chart-container">
+<canvas id="throughputChart"></canvas>
+</div>
+</div>
+<div class="chart-card">
+<div class="chart-title">Cost Optimization Trends</div>
+<div class="chart-container">
+<canvas id="costChart"></canvas>
+</div>
+</div>
+</div>
+</div>
+<div class="tab-content" id="alerts">
+<div class="alerts-layout">
+<div class="alerts-list">
+<div class="alerts-header">
+<h3 class="alerts-title">System Alerts &amp; Recommendations</h3>
+<span class="alert-count" id="alertCount">3</span>
+</div>
+<div id="alertsContainer">
+</div>
+</div>
+<div class="sidebar-card">
+<h3 class="sidebar-title">Alert Filters</h3>
+<div class="control-section">
+<label class="control-label">Severity</label>
+<select class="control-select">
+<option value="all">All Levels</option>
+<option value="critical">Critical Only</option>
+<option value="warning">Warning &amp; Above</option>
+</select>
+</div>
+<div class="control-section">
+<label class="control-label">Category</label>
+<select class="control-select">
+<option value="all">All Categories</option>
+<option value="performance">Performance</option>
+<option value="security">Security</option>
+<option value="maintenance">Maintenance</option>
+</select>
+</div>
+<button class="btn-secondary" onclick="clearAlerts()">Clear All Alerts</button>
+<button class="btn-secondary" onclick="exportAlerts()">Export Alerts</button>
+</div>
+</div>
+</div>
+<div class="tab-content" id="settings">
+<div class="settings-layout">
+<div class="settings-nav">
+<div class="settings-nav-item active" onclick="switchSettingsTab(event, 'general')">General</div>
+<div class="settings-nav-item" onclick="switchSettingsTab(event, 'integration')">Integration</div>
+<div class="settings-nav-item" onclick="switchSettingsTab(event, 'notifications')">Notifications</div>
+<div class="settings-nav-item" onclick="switchSettingsTab(event, 'security')">Security</div>
+<div class="settings-nav-item" onclick="switchSettingsTab(event, 'advanced')">Advanced</div>
+</div>
+<div class="settings-content" id="settingsContent">
+<div class="settings-section">
+<h3 class="settings-section-title">General Configuration</h3>
+<div class="form-group">
+<label class="form-label">Platform Name</label>
+<input class="form-input" type="text" value="SecureFood Digital Twin Platform"/>
+</div>
+<div class="form-group">
+<label class="form-label">Default Supply Chain</label>
+<select class="form-input">
+<option>Ukrainian Grain Network</option>
+<option>EU Dairy Systems</option>
+<option>Mediterranean Aquaculture</option>
+<option>Iberian Fresh Produce</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label">Refresh Interval (seconds)</label>
+<input class="form-input" type="number" value="5"/>
+</div>
+<button class="btn-primary">Save Changes</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
         // Global variables
         let scene, camera, renderer, animationId;
         let supplyChainData = [];
