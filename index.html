@@ -6,7 +6,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>SecureFood Digital Twin Platform | IRIS Technology Solutions</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <style>
         * {
@@ -672,7 +672,18 @@
                 padding: 16px 20px;
             }
         }
-    </style>
+    
+.node-label {
+    font-size: 13px;
+    color: #1f2937;
+    background: rgba(255,255,255,0.85);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+#threejs-container { position: relative; }</style>
 </head>
 <body>
 <div class="loading-overlay" id="loadingOverlay">
@@ -1818,6 +1829,7 @@
             if (camera && renderer && container) {
                 camera.aspect = container.clientWidth / container.clientHeight;
                 camera.updateProjectionMatrix();
+    labelRenderer.setSize(container.clientWidth, container.clientHeight);
                 renderer.setSize(container.clientWidth, container.clientHeight);
             }
         });
@@ -1850,6 +1862,158 @@
         console.log('Developed by IRIS Technology Solutions');
         console.log('Enterprise supply chain intelligence and predictive analytics');
         console.log('Keyboard shortcuts: Ctrl+R (analyze), Ctrl+S (simulate), Ctrl+I (insights), Ctrl+E (export)');
-    </script>
+    
+let labelRenderer;
+
+function addNodeLabel(text, position) {
+    const div = document.createElement('div');
+    div.className = 'node-label';
+    div.textContent = text;
+    div.style.marginTop = '-1em';
+    const label = new THREE.CSS2DObject(div);
+    label.position.set(position.x, position.y + 3, position.z);
+    return label;
+}
+
+function initializeThreeJS() {
+    const container = document.getElementById('threejs-container');
+    if (!container) return;
+
+    // Scene setup
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf8fafc);
+    scene.fog = new THREE.Fog(0xf8fafc, 50, 200);
+
+    // Camera setup
+    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.set(0, 20, 40);
+
+    // Renderer setup
+    renderer = new THREE.WebGLRenderer({ 
+        antialias: true,
+        alpha: true
+    });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    // CSS2DRenderer setup
+    labelRenderer = new THREE.CSS2DRenderer();
+    labelRenderer.setSize(container.clientWidth, container.clientHeight);
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.top = '0';
+    labelRenderer.domElement.style.left = '0';
+    labelRenderer.domElement.style.width = '100%';
+    labelRenderer.domElement.style.height = '100%';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    container.appendChild(labelRenderer.domElement);
+
+    // Lighting setup
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(20, 30, 20);
+    directionalLight.castShadow = true;
+    scene.add(directionalLight);
+
+    // Create supply chain network
+    createSupplyChainNetwork();
+
+    // Start animation loop
+    animate();
+
+    // Add camera controls
+    addCameraControls();
+}
+
+function animate() {
+    animationId = requestAnimationFrame(animate);
+
+    // Animate particles
+    supplyChainData.forEach(object => {
+        if (object.userData && object.userData.originalPosition) {
+            const time = Date.now() * 0.001;
+            object.position.y = object.userData.originalPosition.y + 
+                Math.sin(time * object.userData.speed + object.userData.phase) * 2;
+            object.rotation.y += 0.01;
+        }
+    });
+
+    // Rotate main nodes slowly
+    supplyChainData.forEach(object => {
+        if (object.userData && object.userData.type) {
+            object.rotation.y += 0.005;
+        }
+    });
+
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+}
+
+function createSupplyChainNetwork() {
+    const nodes = [
+        { name: 'Production', position: [-20, 0, -10], type: 'production', color: 0x10b981 },
+        { name: 'Processing', position: [-5, 0, 5], type: 'processing', color: 0x2563eb },
+        { name: 'Distribution', position: [15, 0, -5], type: 'distribution', color: 0xf59e0b },
+        { name: 'Quality Control', position: [0, 0, 15], type: 'quality', color: 0x8b5cf6 },
+        { name: 'Logistics Hub', position: [10, 0, 20], type: 'logistics', color: 0xef4444 },
+        { name: 'Retail Network', position: [25, 0, 10], type: 'retail', color: 0x06b6d4 }
+    ];
+
+    // Create nodes
+    nodes.forEach((nodeData, index) => {
+        const geometry = new THREE.CylinderGeometry(2, 2, 4, 12);
+        const material = new THREE.MeshLambertMaterial({ 
+            color: nodeData.color,
+            transparent: true,
+            opacity: 0.9
+        });
+
+        const node = new THREE.Mesh(geometry, material);
+        node.position.set(...nodeData.position);
+        node.castShadow = true;
+        node.receiveShadow = true;
+        node.userData = nodeData;
+
+        scene.add(node);
+        supplyChainData.push(node);
+
+        // Add label
+        const label = addNodeLabel(nodeData.name, node.position);
+        scene.add(label);
+
+        // Add floating data particles
+        for (let i = 0; i < 6; i++) {
+            const particleGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+            const particleMaterial = new THREE.MeshBasicMaterial({ 
+                color: nodeData.color,
+                transparent: true,
+                opacity: 0.6
+            });
+            const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+
+            const angle = (i / 6) * Math.PI * 2;
+            const radius = 4 + Math.random() * 2;
+            particle.position.set(
+                nodeData.position[0] + Math.cos(angle) * radius,
+                nodeData.position[1] + Math.random() * 6 + 2,
+                nodeData.position[2] + Math.sin(angle) * radius
+            );
+
+            particle.userData = {
+                originalPosition: particle.position.clone(),
+                speed: Math.random() * 0.02 + 0.01,
+                phase: Math.random() * Math.PI * 2
+            };
+
+            scene.add(particle);
+            supplyChainData.push(particle);
+        }
+    });
+
+    // Existing connection and ground code remains...
+}
+</script>
 </body>
 </html>
