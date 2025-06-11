@@ -38,30 +38,20 @@
         .platform-logo {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 16px; /* Space between logo and text */
         }
 
+        /* --- NEW CSS FOR THE LOGO IMAGE --- */
+        .full-logo-image { /* Class name for your PNG logo */
+            height: 44px; /* Set the desired height for your logo */
+            width: auto; /* IMPORTANT: Maintain aspect ratio */
+        }
+
+        /* --- HIDE THE OLD LOGO MARK (in case it's still referenced somewhere) --- */
         .logo-mark {
-            width: 48px;
-            height: 48px;
-            background: #ffffff;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #e5e7eb;
-            position: relative;
-            overflow: hidden;
+            display: none; /* This ensures the original "SF" styling is not visible */
         }
-
-        .securefood-logo {
-            width: auto;
-            height: 90px;
-            background-image: url('https://diggers33.github.io/SecureFood/securefood-logo.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
+        /* --- END NEW CSS --- */
 
         .platform-title {
             color: #111827;
@@ -195,7 +185,6 @@
             display: grid;
             grid-template-rows: auto 1fr;
             gap: 24px;
-            min-height: 600px;
         }
 
         .kpi-grid {
@@ -309,8 +298,6 @@
             flex: 1;
             width: 100%;
             background: #f8fafc;
-            min-height: 420px;
-            height: 100%;
         }
 
         .sidebar {
@@ -700,9 +687,7 @@
 
     <header class="platform-header">
         <div class="platform-logo">
-            <div class="logo-mark">
-                <div class="securefood-logo"></div>
-            </div>
+            <img src="securefood-logo.png" alt="SecureFood Logo" class="full-logo-image">
             <div>
                 <h1 class="platform-title">SecureFood Digital Twin Platform</h1>
                 <p class="platform-subtitle">IRIS Technology Solutions | Enterprise Food System Intelligence</p>
@@ -733,7 +718,6 @@
             </button>
         </nav>
 
-        <!-- Dashboard Tab -->
         <div id="dashboard" class="tab-content active">
             <div class="dashboard-grid">
                 <div class="main-content">
@@ -831,7 +815,6 @@
             </div>
         </div>
 
-        <!-- Analytics Tab -->
         <div id="analytics" class="tab-content">
             <div class="analytics-layout">
                 <div class="chart-card">
@@ -861,7 +844,6 @@
             </div>
         </div>
 
-        <!-- Alerts Tab -->
         <div id="alerts" class="tab-content">
             <div class="alerts-layout">
                 <div class="alerts-list">
@@ -870,8 +852,7 @@
                         <span class="alert-count" id="alertCount">3</span>
                     </div>
                     <div id="alertsContainer">
-                        <!-- Alerts will be populated by JavaScript -->
-                    </div>
+                        </div>
                 </div>
                 <div class="sidebar-card">
                     <h3 class="sidebar-title">Alert Filters</h3>
@@ -898,7 +879,6 @@
             </div>
         </div>
 
-        <!-- Settings Tab -->
         <div id="settings" class="tab-content">
             <div class="settings-layout">
                 <div class="settings-nav">
@@ -1416,247 +1396,100 @@
         }
 
         function createSupplyChainNetwork() {
-            // Create a more sophisticated supply chain visualization
             const nodes = [
-                { 
-                    name: 'Farm Production', 
-                    position: [-25, 2, 0], 
-                    type: 'production', 
-                    color: 0x22c55e,
-                    size: 3,
-                    status: 'optimal'
-                },
-                { 
-                    name: 'Cold Storage', 
-                    position: [-10, 1, -8], 
-                    type: 'storage', 
-                    color: 0x06b6d4,
-                    size: 2.5,
-                    status: 'monitoring'
-                },
-                { 
-                    name: 'Processing Plant', 
-                    position: [0, 3, 5], 
-                    type: 'processing', 
-                    color: 0x3b82f6,
-                    size: 4,
-                    status: 'optimal'
-                },
-                { 
-                    name: 'Quality Control', 
-                    position: [8, 1, -3], 
-                    type: 'quality', 
-                    color: 0x8b5cf6,
-                    size: 2,
-                    status: 'optimal'
-                },
-                { 
-                    name: 'Distribution Hub', 
-                    position: [20, 2, 8], 
-                    type: 'distribution', 
-                    color: 0xf59e0b,
-                    size: 3.5,
-                    status: 'optimal'
-                },
-                { 
-                    name: 'Retail Network', 
-                    position: [35, 1, 0], 
-                    type: 'retail', 
-                    color: 0xef4444,
-                    size: 3,
-                    status: 'optimal'
-                }
+                { name: 'Production', position: [-20, 0, -10], type: 'production', color: 0x10b981 },
+                { name: 'Processing', position: [-5, 0, 5], type: 'processing', color: 0x2563eb },
+                { name: 'Distribution', position: [15, 0, -5], type: 'distribution', color: 0xf59e0b },
+                { name: 'Quality Control', position: [0, 0, 15], type: 'quality', color: 0x8b5cf6 },
+                { name: 'Logistics Hub', position: [10, 0, 20], type: 'logistics', color: 0xef4444 },
+                { name: 'Retail Network', position: [25, 0, 10], type: 'retail', color: 0x06b6d4 }
             ];
 
-            // Clear existing objects
-            while(scene.children.length > 0){ 
-                scene.remove(scene.children[0]); 
-            }
-            supplyChainData = [];
-
-            // Add lighting
-            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-            scene.add(ambientLight);
-
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(20, 30, 20);
-            directionalLight.castShadow = true;
-            scene.add(directionalLight);
-
-            // Create sophisticated nodes
+            // Create nodes
             nodes.forEach((nodeData, index) => {
-                // Main node structure
-                const nodeGroup = new THREE.Group();
-                
-                // Base platform
-                const platformGeometry = new THREE.CylinderGeometry(nodeData.size + 0.5, nodeData.size + 0.5, 0.2, 16);
-                const platformMaterial = new THREE.MeshLambertMaterial({ 
-                    color: 0xe5e7eb,
-                    transparent: true,
-                    opacity: 0.8
-                });
-                const platform = new THREE.Mesh(platformGeometry, platformMaterial);
-                platform.position.y = -0.1;
-                nodeGroup.add(platform);
-
-                // Main building/facility
-                const buildingGeometry = new THREE.BoxGeometry(nodeData.size, nodeData.size * 1.5, nodeData.size);
-                const buildingMaterial = new THREE.MeshLambertMaterial({ 
+                const geometry = new THREE.CylinderGeometry(2, 2, 4, 12);
+                const material = new THREE.MeshLambertMaterial({ 
                     color: nodeData.color,
                     transparent: true,
                     opacity: 0.9
                 });
-                const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
-                building.position.y = nodeData.size * 0.75;
-                building.castShadow = true;
-                building.receiveShadow = true;
-                nodeGroup.add(building);
+                
+                const node = new THREE.Mesh(geometry, material);
+                node.position.set(...nodeData.position);
+                node.castShadow = true;
+                node.receiveShadow = true;
+                node.userData = nodeData;
+                
+                scene.add(node);
+                supplyChainData.push(node);
 
-                // Status indicator
-                const statusGeometry = new THREE.SphereGeometry(0.3, 8, 8);
-                const statusColor = nodeData.status === 'optimal' ? 0x22c55e : 
-                                  nodeData.status === 'warning' ? 0xf59e0b : 0xef4444;
-                const statusMaterial = new THREE.MeshBasicMaterial({ 
-                    color: statusColor,
-                    transparent: true,
-                    opacity: 0.9
-                });
-                const statusIndicator = new THREE.Mesh(statusGeometry, statusMaterial);
-                statusIndicator.position.set(nodeData.size * 0.7, nodeData.size * 1.5, 0);
-                nodeGroup.add(statusIndicator);
-
-                // Add pulsing effect to status indicator
-                statusIndicator.userData = {
-                    originalScale: statusIndicator.scale.clone(),
-                    pulseSpeed: 0.02
-                };
-
-                // Add data flow lines above the building
-                for (let i = 0; i < 3; i++) {
-                    const lineGeometry = new THREE.BoxGeometry(0.1, 0.1, nodeData.size * 0.8);
-                    const lineMaterial = new THREE.MeshBasicMaterial({ 
+                // Add floating data particles
+                for (let i = 0; i < 6; i++) {
+                    const particleGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+                    const particleMaterial = new THREE.MeshBasicMaterial({ 
                         color: nodeData.color,
                         transparent: true,
                         opacity: 0.6
                     });
-                    const line = new THREE.Mesh(lineGeometry, lineMaterial);
-                    line.position.set(
-                        (i - 1) * 0.5,
-                        nodeData.size * 1.8 + i * 0.3,
-                        0
+                    const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+                    
+                    const angle = (i / 6) * Math.PI * 2;
+                    const radius = 4 + Math.random() * 2;
+                    particle.position.set(
+                        nodeData.position[0] + Math.cos(angle) * radius,
+                        nodeData.position[1] + Math.random() * 6 + 2,
+                        nodeData.position[2] + Math.sin(angle) * radius
                     );
-                    line.rotation.y = Math.PI / 4;
-                    line.userData = {
-                        speed: 0.01 + i * 0.005,
-                        originalY: line.position.y
+                    
+                    particle.userData = {
+                        originalPosition: particle.position.clone(),
+                        speed: Math.random() * 0.02 + 0.01,
+                        phase: Math.random() * Math.PI * 2
                     };
-                    nodeGroup.add(line);
+                    
+                    scene.add(particle);
+                    supplyChainData.push(particle);
                 }
-
-                // Position the entire node group
-                nodeGroup.position.set(...nodeData.position);
-                nodeGroup.userData = nodeData;
-                
-                scene.add(nodeGroup);
-                supplyChainData.push(nodeGroup);
             });
 
-            // Create sophisticated connection paths
+            // Create connections between nodes
             for (let i = 0; i < nodes.length - 1; i++) {
                 const start = new THREE.Vector3(...nodes[i].position);
                 const end = new THREE.Vector3(...nodes[i + 1].position);
                 
-                // Create curved path
-                const midPoint = new THREE.Vector3(
-                    (start.x + end.x) / 2,
-                    Math.max(start.y, end.y) + 8,
-                    (start.z + end.z) / 2
+                const curve = new THREE.QuadraticBezierCurve3(
+                    start,
+                    new THREE.Vector3(
+                        (start.x + end.x) / 2,
+                        Math.max(start.y, end.y) + 5,
+                        (start.z + end.z) / 2
+                    ),
+                    end
                 );
 
-                const curve = new THREE.QuadraticBezierCurve3(start, midPoint, end);
-                const points = curve.getPoints(100);
-                
-                // Main connection line
+                const points = curve.getPoints(50);
                 const geometry = new THREE.BufferGeometry().setFromPoints(points);
                 const material = new THREE.LineBasicMaterial({ 
-                    color: 0x6b7280,
+                    color: 0x9ca3af,
                     transparent: true,
-                    opacity: 0.8,
-                    linewidth: 3
+                    opacity: 0.6
                 });
                 const line = new THREE.Line(geometry, material);
                 scene.add(line);
-
-                // Add animated data packets along the path
-                for (let j = 0; j < 5; j++) {
-                    const packetGeometry = new THREE.SphereGeometry(0.2, 8, 8);
-                    const packetMaterial = new THREE.MeshBasicMaterial({ 
-                        color: 0x3b82f6,
-                        transparent: true,
-                        opacity: 0.8
-                    });
-                    const packet = new THREE.Mesh(packetGeometry, packetMaterial);
-                    
-                    packet.userData = {
-                        curve: curve,
-                        progress: j / 5,
-                        speed: 0.005
-                    };
-                    
-                    scene.add(packet);
-                    supplyChainData.push(packet);
-                }
             }
 
-            // Add environmental elements
-            // Ground plane with grid
-            const groundGeometry = new THREE.PlaneGeometry(100, 60);
+            // Add ground plane
+            const groundGeometry = new THREE.PlaneGeometry(100, 100);
             const groundMaterial = new THREE.MeshLambertMaterial({ 
-                color: 0xf8fafc,
+                color: 0xe5e7eb,
                 transparent: true,
-                opacity: 0.8
+                opacity: 0.3
             });
             const ground = new THREE.Mesh(groundGeometry, groundMaterial);
             ground.rotation.x = -Math.PI / 2;
             ground.position.y = -2;
             ground.receiveShadow = true;
             scene.add(ground);
-
-            // Add grid lines
-            const gridHelper = new THREE.GridHelper(100, 20, 0xe5e7eb, 0xf3f4f6);
-            gridHelper.position.y = -1.9;
-            scene.add(gridHelper);
-
-            // Add some atmospheric particles
-            const particleCount = 50;
-            const particleGeometry = new THREE.BufferGeometry();
-            const particlePositions = new Float32Array(particleCount * 3);
-            
-            for (let i = 0; i < particleCount * 3; i += 3) {
-                particlePositions[i] = (Math.random() - 0.5) * 80;
-                particlePositions[i + 1] = Math.random() * 20 + 5;
-                particlePositions[i + 2] = (Math.random() - 0.5) * 50;
-            }
-            
-            particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-            
-            const particleMaterial = new THREE.PointsMaterial({
-                color: 0x94a3b8,
-                size: 0.5,
-                transparent: true,
-                opacity: 0.6
-            });
-            
-            const particles = new THREE.Points(particleGeometry, particleMaterial);
-            scene.add(particles);
-            
-            particles.userData = { 
-                rotationSpeed: 0.001,
-                positions: particlePositions
-            };
-            supplyChainData.push(particles);
-
-            console.log('Enhanced 3D supply chain visualization created');
         }
 
         function animate() {
