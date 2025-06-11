@@ -41,17 +41,14 @@
             gap: 16px; /* Space between logo and text */
         }
 
-        /* --- NEW CSS FOR THE LOGO IMAGE --- */
         .full-logo-image { /* Class name for your PNG logo */
-            height: 90px; /* Set the desired height for your logo */
+            height: 44px; /* Set the desired height for your logo */
             width: auto; /* IMPORTANT: Maintain aspect ratio */
         }
 
-        /* --- HIDE THE OLD LOGO MARK (in case it's still referenced somewhere) --- */
         .logo-mark {
             display: none; /* This ensures the original "SF" styling is not visible */
         }
-        /* --- END NEW CSS --- */
 
         .platform-title {
             color: #111827;
@@ -942,7 +939,7 @@
             evt.currentTarget.classList.add('active');
 
             // Initialize charts if switching to analytics tab
-            if (tabName === 'analytics' && !throughputChart) {
+            if (tabName === 'analytics' && !throughputChart) { // Check if any chart is not initialized
                 setTimeout(initializeAnalyticsCharts, 100);
             }
 
@@ -1212,37 +1209,91 @@
 
         // Initialize Analytics Charts
         function initializeAnalyticsCharts() {
+            // Helper to create gradient for charts
+            function getGradient(ctx, chartArea, colorStart, colorEnd) {
+                if (!chartArea) {
+                    // This can happen if the chart is not yet rendered or has no dimensions
+                    return null;
+                }
+                const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                gradient.addColorStop(0, colorEnd);
+                gradient.addColorStop(1, colorStart);
+                return gradient;
+            }
+
             // Performance Chart
             const perfCtx = document.getElementById('performanceChart');
             if (perfCtx) {
+                // Destroy existing chart if it exists to prevent re-initialization issues
+                if (performanceChart) {
+                    performanceChart.destroy();
+                }
                 performanceChart = new Chart(perfCtx.getContext('2d'), {
                     type: 'line',
                     data: {
                         labels: digitalTwinEngine.generateTimeLabels(),
                         datasets: [{
-                            label: 'Efficiency %',
+                            label: 'Efficiency',
                             data: digitalTwinEngine.generatePerformanceData(),
                             borderColor: '#2563eb',
-                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            backgroundColor: (context) => {
+                                const chart = context.chart;
+                                const { ctx, chartArea } = chart;
+                                return getGradient(ctx, chartArea, 'rgba(37, 99, 235, 0.6)', 'rgba(37, 99, 235, 0)');
+                            },
                             borderWidth: 2,
                             fill: true,
-                            tension: 0.4
+                            tension: 0.4, // Smooth curve
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#2563eb',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { display: false }
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '%';
+                                    }
+                                },
+                                // Modern tooltip styling
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 14 },
+                                padding: 10,
+                                cornerRadius: 4
+                            }
                         },
                         scales: {
                             x: {
-                                grid: { display: false }
+                                grid: { 
+                                    display: false 
+                                },
+                                ticks: {
+                                    color: '#6b7280' // Label color
+                                }
                             },
                             y: {
                                 min: 85,
                                 max: 100,
-                                grid: { color: '#f3f4f6' }
+                                grid: { 
+                                    color: '#e5e7eb', // Lighter grid lines
+                                    drawBorder: false // No border on y-axis
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%'; // Add percentage suffix
+                                    },
+                                    color: '#6b7280'
+                                }
                             }
                         }
                     }
@@ -1252,15 +1303,20 @@
             // Risk Chart
             const riskCtx = document.getElementById('riskChart');
             if (riskCtx) {
+                // Destroy existing chart if it exists
+                if (riskChart) {
+                    riskChart.destroy();
+                }
                 riskChart = new Chart(riskCtx.getContext('2d'), {
                     type: 'doughnut',
                     data: {
                         labels: ['Low Risk', 'Medium Risk', 'High Risk'],
                         datasets: [{
-                            data: [65, 28, 7],
+                            data: [65, 28, 7], // Example data
                             backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
-                            borderWidth: 2,
-                            borderColor: '#ffffff'
+                            borderColor: '#ffffff', // Border between slices
+                            borderWidth: 4, // Thicker border
+                            hoverOffset: 10 // Pop out effect on hover
                         }]
                     },
                     options: {
@@ -1271,11 +1327,35 @@
                                 position: 'bottom',
                                 labels: {
                                     padding: 20,
-                                    usePointStyle: true
+                                    usePointStyle: true,
+                                    font: {
+                                        size: 13,
+                                        weight: '500'
+                                    },
+                                    color: '#374151'
                                 }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed) {
+                                            label += context.parsed + '%'; // Assuming data is percentage
+                                        }
+                                        return label;
+                                    }
+                                },
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 14 },
+                                padding: 10,
+                                cornerRadius: 4
                             }
                         },
-                        cutout: '60%'
+                        cutout: '60%' // Adjust inner circle size
                     }
                 });
             }
@@ -1283,31 +1363,63 @@
             // Throughput Chart
             const throughputCtx = document.getElementById('throughputChart');
             if (throughputCtx) {
+                // Destroy existing chart if it exists
+                if (throughputChart) {
+                    throughputChart.destroy();
+                }
                 throughputChart = new Chart(throughputCtx.getContext('2d'), {
                     type: 'bar',
                     data: {
                         labels: ['Production', 'Processing', 'Distribution', 'Retail'],
                         datasets: [{
-                            label: 'Throughput %',
+                            label: 'Throughput',
                             data: [92, 88, 94, 86],
-                            backgroundColor: '#2563eb',
-                            borderRadius: 4
+                            backgroundColor: '#2563eb', // Solid color
+                            borderRadius: 6, // Rounded bars
+                            barPercentage: 0.7, // Control bar width
+                            categoryPercentage: 0.8 // Control spacing between categories
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { display: false }
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.parsed.y + '%';
+                                    }
+                                },
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 14 },
+                                padding: 10,
+                                cornerRadius: 4
+                            }
                         },
                         scales: {
                             x: {
-                                grid: { display: false }
+                                grid: { display: false }, // Remove vertical grid lines
+                                ticks: {
+                                    color: '#6b7280'
+                                }
                             },
                             y: {
                                 min: 0,
                                 max: 100,
-                                grid: { color: '#f3f4f6' }
+                                grid: { 
+                                    color: '#e5e7eb', // Lighter horizontal grid lines
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%'; // Add percentage suffix
+                                    },
+                                    color: '#6b7280'
+                                }
                             }
                         }
                     }
@@ -1317,33 +1429,72 @@
             // Cost Chart
             const costCtx = document.getElementById('costChart');
             if (costCtx) {
+                // Destroy existing chart if it exists
+                if (costChart) {
+                    costChart.destroy();
+                }
                 costChart = new Chart(costCtx.getContext('2d'), {
                     type: 'line',
                     data: {
                         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                         datasets: [{
-                            label: 'Cost Savings (€M)',
+                            label: 'Cost Savings',
                             data: [1.2, 1.8, 2.1, 2.3, 2.4, 2.4],
                             borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            borderWidth: 3,
+                            backgroundColor: (context) => {
+                                const chart = context.chart;
+                                const { ctx, chartArea } = chart;
+                                return getGradient(ctx, chartArea, 'rgba(16, 185, 129, 0.6)', 'rgba(16, 185, 129, 0)');
+                            },
+                            borderWidth: 2,
                             fill: true,
-                            tension: 0.4
+                            tension: 0.4, // Smooth curve
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#10b981',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { display: false }
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': €' + context.parsed.y.toFixed(2) + 'M';
+                                    }
+                                },
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 14 },
+                                padding: 10,
+                                cornerRadius: 4
+                            }
                         },
                         scales: {
                             x: {
-                                grid: { display: false }
+                                grid: { display: false },
+                                ticks: {
+                                    color: '#6b7280'
+                                }
                             },
                             y: {
                                 min: 0,
-                                grid: { color: '#f3f4f6' }
+                                grid: { 
+                                    color: '#e5e7eb',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return '€' + value + 'M'; // Add currency prefix and suffix
+                                    },
+                                    color: '#6b7280'
+                                }
                             }
                         }
                     }
