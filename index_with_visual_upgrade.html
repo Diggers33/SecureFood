@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureFood Digital Twin Platform | IRIS Technology Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #ffffff;
+            color: #1f2937;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .platform-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .platform-logo {
+            display: flex;
+            align-items: center;
+            gap: 16px; /* Space between logo and text */
+        }
+
+        .full-logo-image { /* Class name for your PNG logo */
+            height: 44px; /* Set the desired height for your logo */
+            width: auto; /* IMPORTANT: Maintain aspect ratio */
+        }
+
+        .logo-mark {
+            display: none; /* This ensures the original "SF" styling is not visible */
+        }
+
+        .platform-title {
+            color: #111827;
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .platform-subtitle {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .main-container {
+            max-width: 1920px;
+            margin: 0 auto;
+            padding: 24px 32px;
+        }
+
+        .tab-navigation {
+            display: flex;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 24px;
+            gap: 4px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-button:hover {
+            color: #374151;
+            background: rgba(55, 65, 81, 0.05);
+        }
+
+        .tab-button.active {
+            background: #ffffff;
+            color: #2563eb;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content {
+            background: #ffffff;
+            border-radius: 8px;
+            display: none;
+            min-height: calc(100vh - 220px);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Dashboard Tab Styles */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 24px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .kpi-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            transition: all 0.2s ease;
+        }
+
+        .kpi-card:hover {
+            border-color: #d1d5db;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .kpi-title {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+
+        .kpi-change {
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .change-positive {
+            color: #059669;
+        }
+
+        .change-negative {
+            color: #dc2626;
+        }
+
+        .digital-twin-viewer {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            min-height: 500px;
+        }
+
+        .viewer-header {
+            background: #ffffff;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .viewer-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .viewer-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .viewer-btn {
+            padding: 6px 14px;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            color: #374151;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .viewer-btn:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+        }
+
+        .viewer-btn.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+
+        #threejs-container {
+            flex: 1;
+            width: 100%;
+            background: #f8fafc;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f9fafb;
+        }
+
+        .metric-item:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .control-section {
+            margin-bottom: 16px;
+        }
+
+        .control-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .control-select {
+            width: 100%;
+            padding: 10px 12px;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            color: #374151;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .control-select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 12px 16px;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 8px;
+            font-family: inherit;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        /* Analytics Tab Styles */
+        .analytics-layout {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            padding: 24px;
+        }
+
+        .chart-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            flex: 1;
+            position: relative;
+            min-height: 300px;
+        }
+
+        /* Alerts Tab Styles */
+        .alerts-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+            padding: 24px;
+        }
+
+        .alerts-list {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+
+        .alerts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .alerts-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .alert-count {
+            background: #dc2626;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px;
+            background: #ffffff;
+            border: 1px solid #f3f4f6;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .alert-item:hover {
+            background: #f9fafb;
+            border-color: #e5e7eb;
+        }
+
+        .alert-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .alert-critical { 
+            background: rgba(239, 68, 68, 0.1); 
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        .alert-warning { 
+            background: rgba(245, 158, 11, 0.1); 
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+        .alert-info { 
+            background: rgba(59, 130, 246, 0.1); 
+            color: #2563eb;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .alert-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .alert-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .alert-description {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .alert-time {
+            font-size: 12px;
+            color: #9ca3af;
+            flex-shrink: 0;
+        }
+
+        /* Settings Tab Styles */
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            padding: 24px;
+        }
+
+        .settings-nav {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .settings-nav-item {
+            padding: 12px 16px;
+            color: #6b7280;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .settings-nav-item:hover {
+            background: #f9fafb;
+            color: #374151;
+        }
+
+        .settings-nav-item.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .settings-content {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 32px;
+        }
+
+        .settings-section {
+            margin-bottom: 40px;
+        }
+
+        .settings-section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            color: #374151;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: #374151;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid,
+            .analytics-layout,
+            .alerts-layout,
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                padding: 16px 20px;
+            }
+        }
+    </style>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+<style>
+.label {
+    color: #1f2937;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 2px 6px;
+    font-size: 11px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+.legend-box {
+    position: absolute;
+    top: 70px;
+    right: 30px;
+    background: #ffffffee;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    z-index: 10;
+}
+.legend-box div {
+    margin-bottom: 4px;
+}
+.legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+</style>
+
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Initializing Digital Twin Platform</h3>
+            <p>Synchronizing real-time data streams...</p>
+        </div>
+    </div>
+
+    <header class="platform-header">
+        <div class="platform-logo">
+            <img src="securefood-logo.png" alt="SecureFood Logo" class="full-logo-image">
+            <div>
+                <h1 class="platform-title">SecureFood Digital Twin Platform</h1>
+                <p class="platform-subtitle">IRIS Technology Solutions | Enterprise Food System Intelligence</p>
+            </div>
+        </div>
+        <div class="header-controls">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>System Operational</span>
+            </div>
+            <button class="btn-primary" onclick="exportReport()">Export Report</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <nav class="tab-navigation">
+            <button class="tab-button active" onclick="switchTab(event, 'dashboard')">
+                Dashboard
+            </button>
+            <button class="tab-button" onclick="switchTab(event, 'analytics')">
+                Analytics
+            </button>
+            <button class="tab-button" onclick="switchTab(event, 'alerts')">
+                Alerts
+            </button>
+            <button class="tab-button" onclick="switchTab(event, 'settings')">
+                Settings
+            </button>
+        </nav>
+
+        <div id="dashboard" class="tab-content active">
+            <div class="dashboard-grid">
+                <div class="main-content">
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-title">Supply Chain Efficiency</div>
+                            <div class="kpi-value" id="efficiency-metric">94.2%</div>
+                            <div class="kpi-change change-positive">
+                                ↗ +2.1% vs. last month
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-title">Risk Assessment Score</div>
+                            <div class="kpi-value" id="risk-metric">7.3</div>
+                            <div class="kpi-change change-positive">
+                                ↗ +0.4 (Lower risk)
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-title">Predictive Accuracy</div>
+                            <div class="kpi-value" id="prediction-metric">91.8%</div>
+                            <div class="kpi-change change-positive">
+                                ↗ +1.2% model improvement
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-title">Cost Optimization</div>
+                            <div class="kpi-value" id="cost-metric">€2.4M</div>
+                            <div class="kpi-change change-positive">
+                                ↗ €340K saved this quarter
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="digital-twin-viewer">
+                        <div class="viewer-header">
+                            <div class="viewer-title">Digital Twin Visualization - Supply Chain Network</div>
+                            <div class="viewer-controls">
+                                <button class="viewer-btn active" onclick="setViewMode('network')">Network</button>
+                                <button class="viewer-btn" onclick="setViewMode('flow')">Flow</button>
+                                <button class="viewer-btn" onclick="setViewMode('risk')">Risk</button>
+                                <button class="viewer-btn" onclick="resetCamera()">Reset</button>
+                            </div>
+                        </div>
+                        <div id="threejs-container"></div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="sidebar-card">
+                        <h3 class="sidebar-title">System Metrics</h3>
+                        <div class="metric-item">
+                            <div class="metric-label">Data Accuracy</div>
+                            <div class="metric-value">99.7%</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Sync Latency</div>
+                            <div class="metric-value">23ms</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Active Sensors</div>
+                            <div class="metric-value">1,247</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">System Load</div>
+                            <div class="metric-value">34%</div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <h3 class="sidebar-title">Supply Chain Controls</h3>
+                        <div class="control-section">
+                            <label class="control-label">Active Supply Chain</label>
+                            <select class="control-select" id="chainSelector" onchange="switchSupplyChain()">
+                                <option value="grain">Ukrainian Grain Network</option>
+                                <option value="dairy">EU Dairy Systems</option>
+                                <option value="fish">Mediterranean Aquaculture</option>
+                                <option value="produce">Iberian Fresh Produce</option>
+                            </select>
+                        </div>
+                        <div class="control-section">
+                            <label class="control-label">Analysis Mode</label>
+                            <select class="control-select" id="analysisMode">
+                                <option value="realtime">Real-time Monitoring</option>
+                                <option value="predictive">Predictive Analysis</option>
+                                <option value="historical">Historical Trends</option>
+                                <option value="stress">Stress Testing</option>
+                            </select>
+                        </div>
+                        <button class="btn-secondary" onclick="runAnalysis()">Execute Analysis</button>
+                        <button class="btn-secondary" onclick="runSimulation()">Run Scenario</button>
+                        <button class="btn-secondary" onclick="generateInsights()">AI Insights</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="analytics" class="tab-content">
+            <div class="analytics-layout">
+                <div class="chart-card">
+                    <div class="chart-title">Real-time Performance Metrics</div>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">Risk Assessment Distribution</div>
+                    <div class="chart-container">
+                        <canvas id="riskChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">Supply Chain Throughput</div>
+                    <div class="chart-container">
+                        <canvas id="throughputChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">Cost Optimization Trends</div>
+                    <div class="chart-container">
+                        <canvas id="costChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="alerts" class="tab-content">
+            <div class="alerts-layout">
+                <div class="alerts-list">
+                    <div class="alerts-header">
+                        <h3 class="alerts-title">System Alerts & Recommendations</h3>
+                        <span class="alert-count" id="alertCount">3</span>
+                    </div>
+                    <div id="alertsContainer">
+                        </div>
+                </div>
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">Alert Filters</h3>
+                    <div class="control-section">
+                        <label class="control-label">Severity</label>
+                        <select class="control-select">
+                            <option value="all">All Levels</option>
+                            <option value="critical">Critical Only</option>
+                            <option value="warning">Warning & Above</option>
+                        </select>
+                    </div>
+                    <div class="control-section">
+                        <label class="control-label">Category</label>
+                        <select class="control-select">
+                            <option value="all">All Categories</option>
+                            <option value="performance">Performance</option>
+                            <option value="security">Security</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                    <button class="btn-secondary" onclick="clearAlerts()">Clear All Alerts</button>
+                    <button class="btn-secondary" onclick="exportAlerts()">Export Alerts</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings" class="tab-content">
+            <div class="settings-layout">
+                <div class="settings-nav">
+                    <div class="settings-nav-item active" onclick="switchSettingsTab(event, 'general')">General</div>
+                    <div class="settings-nav-item" onclick="switchSettingsTab(event, 'integration')">Integration</div>
+                    <div class="settings-nav-item" onclick="switchSettingsTab(event, 'notifications')">Notifications</div>
+                    <div class="settings-nav-item" onclick="switchSettingsTab(event, 'security')">Security</div>
+                    <div class="settings-nav-item" onclick="switchSettingsTab(event, 'advanced')">Advanced</div>
+                </div>
+                <div class="settings-content" id="settingsContent">
+                    <div class="settings-section">
+                        <h3 class="settings-section-title">General Configuration</h3>
+                        <div class="form-group">
+                            <label class="form-label">Platform Name</label>
+                            <input type="text" class="form-input" value="SecureFood Digital Twin Platform">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Default Supply Chain</label>
+                            <select class="form-input">
+                                <option>Ukrainian Grain Network</option>
+                                <option>EU Dairy Systems</option>
+                                <option>Mediterranean Aquaculture</option>
+                                <option>Iberian Fresh Produce</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Refresh Interval (seconds)</label>
+                            <input type="number" class="form-input" value="5">
+                        </div>
+                        <button class="btn-primary">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let scene, camera, renderer, animationId;
+        let supplyChainData = [];
+        let performanceChart, riskChart, throughputChart, costChart;
+        let digitalTwinEngine;
+        let currentViewMode = 'network';
+
+        // Tab switching functionality
+        function switchTab(evt, tabName) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+
+            // Remove active class from all tab buttons
+            const tabButtons = document.getElementsByClassName('tab-button');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+
+            // Show the selected tab and mark button as active
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+
+            // Initialize charts if switching to analytics tab
+            if (tabName === 'analytics' && !throughputChart) { // Check if any chart is not initialized
+                setTimeout(initializeAnalyticsCharts, 100);
+            }
+
+            // Load alerts if switching to alerts tab
+            if (tabName === 'alerts') {
+                loadAlerts();
+            }
+        }
+
+        function switchSettingsTab(evt, tabName) {
+            // Remove active class from all settings nav items
+            const navItems = document.querySelectorAll('.settings-nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Add active class to clicked item
+            evt.currentTarget.classList.add('active');
+
+            // Update settings content based on tab
+            updateSettingsContent(tabName);
+        }
+
+        function updateSettingsContent(tabName) {
+            const content = document.getElementById('settingsContent');
+            
+            const contentMap = {
+                general: `
+                    <div class="settings-section">
+                        <h3 class="settings-section-title">General Configuration</h3>
+                        <div class="form-group">
+                            <label class="form-label">Platform Name</label>
+                            <input type="text" class="form-input" value="SecureFood Digital Twin Platform">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Default Supply Chain</label>
+                            <select class="form-input">
+                                <option>Ukrainian Grain Network</option>
+                                <option>EU Dairy Systems</option>
+                                <option>Mediterranean Aquaculture</option>
+                                <option>Iberian Fresh Produce</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Refresh Interval (seconds)</label>
+                            <input type="number" class="form-input" value="5">
+                        </div>
+                        <button class="btn-primary">Save Changes</button>
+                    </div>
+                `,
+                integration: `
+                    <div class="settings-section">
+                        <h3 class="settings-section-title">SecureFood Ecosystem Integration</h3>
+                        <div class="form-group">
+                            <label class="form-label">Observatory Dashboard API</label>
+                            <input type="url" class="form-input" value="https://api.securefood.eu/observatory">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Early Warning System Endpoint</label>
+                            <input type="url" class="form-input" value="https://api.securefood.eu/alerts">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">RESILOG API Key</label>
+                            <input type="password" class="form-input" value="sk-iris-dt-2024...">
+                        </div>
+                        <button class="btn-primary">Test Connections</button>
+                    </div>
+                `,
+                notifications: `
+                    <div class="settings-section">
+                        <h3 class="settings-section-title">Notification Preferences</h3>
+                        <div class="form-group">
+                            <label class="form-label">Email Notifications</label>
+                            <select class="form-input">
+                                <option>All Alerts</option>
+                                <option>Critical Only</option>
+                                <option>Disabled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">SMS Alerts</label>
+                            <select class="form-input">
+                                <option>Critical Only</option>
+                                <option>Disabled</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary">Update Preferences</button>
+                    </div>
+                `,
+                security: `
+                    <div class="settings-section">
+                        <h3 class="settings-section-title">Security Configuration</h3>
+                        <div class="form-group">
+                            <label class="form-label">Session Timeout (minutes)</label>
+                            <input type="number" class="form-input" value="120">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Two-Factor Authentication</label>
+                            <select class="form-input">
+                                <option>Enabled</option>
+                                <option>Disabled</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary">Apply Security Settings</button>
+                    </div>
+                `,
+                advanced: `
+                    <div class="settings-section">
+                        <h3 class="settings-section-title">Advanced Settings</h3>
+                        <div class="form-group">
+                            <label class="form-label">Data Retention Period (days)</label>
+                            <input type="number" class="form-input" value="365">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Performance Mode</label>
+                            <select class="form-input">
+                                <option>High Performance</option>
+                                <option>Balanced</option>
+                                <option>Power Saving</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary">Save Advanced Settings</button>
+                    </div>
+                `
+            };
+
+            content.innerHTML = contentMap[tabName] || contentMap.general;
+        }
+
+        // Digital Twin Engine Class
+        class DigitalTwinEngine {
+            constructor() {
+                this.metrics = {
+                    efficiency: 94.2,
+                    riskScore: 7.3,
+                    accuracy: 91.8,
+                    costSavings: 2.4
+                };
+                this.alertSystem = new AlertSystem();
+            }
+
+            initialize() {
+                this.initializeDashboardCharts();
+                this.startRealTimeUpdates();
+                this.initializeAlerts();
+            }
+
+            initializeDashboardCharts() {
+                // Performance Chart for Dashboard (will be created when analytics tab is opened)
+                console.log('Digital Twin Engine initialized');
+            }
+
+            startRealTimeUpdates() {
+                setInterval(() => {
+                    this.updateMetrics();
+                }, 5000);
+            }
+
+            updateMetrics() {
+                // Simulate real-time metric updates
+                const efficiencyChange = (Math.random() - 0.5) * 0.2;
+                this.metrics.efficiency = Math.max(85, Math.min(100, this.metrics.efficiency + efficiencyChange));
+                
+                const riskChange = (Math.random() - 0.5) * 0.1;
+                this.metrics.riskScore = Math.max(5, Math.min(10, this.metrics.riskScore + riskChange));
+                
+                // Update dashboard metrics
+                document.getElementById('efficiency-metric').textContent = this.metrics.efficiency.toFixed(1) + '%';
+                document.getElementById('risk-metric').textContent = this.metrics.riskScore.toFixed(1);
+            }
+
+            initializeAlerts() {
+                // Initialize with some sample alerts
+                this.alertSystem.addAlert('warning', 'Cold Chain Temperature Deviation', 
+                    'Refrigerated transport RT-4429 experiencing +2°C above optimal range');
+                this.alertSystem.addAlert('info', 'Route Optimization Available', 
+                    'AI recommends alternative routing for grain shipments from Odessa port');
+                this.alertSystem.addAlert('critical', 'Predictive Maintenance Alert', 
+                    'Processing facility PF-12 shows 85% probability of equipment failure within 72 hours');
+            }
+
+            generateTimeLabels() {
+                const labels = [];
+                for (let i = 23; i >= 0; i--) {
+                    const date = new Date();
+                    date.setHours(date.getHours() - i);
+                    labels.push(date.getHours().toString().padStart(2, '0') + ':00');
+                }
+                return labels;
+            }
+
+            generatePerformanceData() {
+                const data = [];
+                for (let i = 0; i < 24; i++) {
+                    data.push(90 + Math.random() * 8 + Math.sin(i / 4) * 3);
+                }
+                return data;
+            }
+        }
+
+        // Alert System Class
+        class AlertSystem {
+            constructor() {
+                this.alerts = [];
+                this.maxAlerts = 10;
+            }
+
+            addAlert(type, title, description) {
+                const alert = {
+                    id: Date.now(),
+                    type: type,
+                    title: title,
+                    description: description,
+                    timestamp: new Date()
+                };
+
+                this.alerts.unshift(alert);
+                if (this.alerts.length > this.maxAlerts) {
+                    this.alerts.pop();
+                }
+
+                this.renderAlerts();
+            }
+
+            renderAlerts() {
+                const container = document.getElementById('alertsContainer');
+                if (!container) return;
+
+                container.innerHTML = '';
+
+                this.alerts.forEach(alert => {
+                    const alertElement = document.createElement('div');
+                    alertElement.className = 'alert-item';
+                    
+                    const iconMap = {
+                        'critical': '!',
+                        'warning': '⚠',
+                        'info': 'i'
+                    };
+
+                    alertElement.innerHTML = `
+                        <div class="alert-icon alert-${alert.type}">${iconMap[alert.type]}</div>
+                        <div class="alert-content">
+                            <div class="alert-title">${alert.title}</div>
+                            <div class="alert-description">${alert.description}</div>
+                        </div>
+                        <div class="alert-time">${this.getTimeAgo(alert.timestamp)}</div>
+                    `;
+
+                    container.appendChild(alertElement);
+                });
+
+                // Update alert count
+                const countElement = document.getElementById('alertCount');
+                if (countElement) {
+                    countElement.textContent = this.alerts.length;
+                }
+            }
+
+            getTimeAgo(timestamp) {
+                const now = new Date();
+                const diff = Math.floor((now - timestamp) / 1000);
+                
+                if (diff < 60) return `${diff}s ago`;
+                if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+                return `${Math.floor(diff / 3600)}h ago`;
+            }
+        }
+
+        // Initialize Analytics Charts
+        function initializeAnalyticsCharts() {
+            // Helper to create gradient for charts
+            function getGradient(ctx, chartArea, colorStart, colorEnd) {
+                if (!chartArea) {
+                    // This can happen if the chart is not yet rendered or has no dimensions
+                    return null;
+                }
+                const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                gradient.addColorStop(0, colorEnd);
+                gradient.addColorStop(1, colorStart);
+                return gradient;
+            }
+
+            // Performance Chart
+            const perfCtx = document.getElementById('performanceChart');
+            if (perfCtx) {
+                // Destroy existing chart if it exists to prevent re-initialization issues
+                if (performanceChart) {
+                    performanceChart.destroy();
+                }
+                performanceChart = new Chart(perfCtx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: digitalTwinEngine.generateTimeLabels(),
+                        datasets: [{
+                            label: 'Efficiency',
+                            data: digitalTwinEngine.generatePerformanceData(),
+                            borderColor: '#2563eb',
+                            backgroundColor: (context) => {
+                                const chart = context.chart;
+                                const { ctx, chartArea } = chart;
+                                return getGradient(ctx, chartArea, 'rgba(37, 99, 235, 0.6)', 'rgba(37, 99, 235, 0)');
+                            },
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4, // Smooth curve
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#2563eb',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '%';
+                                    }
+                                },
+                                // Modern tooltip styling
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 14 },
+                                padding: 10,
+                                cornerRadius: 4
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { 
+                                    display: false 
+                                },
+                                ticks: {
+                                    color: '#6b7280' // Label color
+                                }
+                            },
+                            y: {
+                                min: 85,
+                                max: 100,
+                                grid: { 
+                                    color: '#e5e7eb', // Lighter grid lines
+                                    drawBorder: false // No border on y-axis
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%'; // Add percentage suffix
+                                    },
+                                    color: '#6b7280'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Risk Chart
+            const riskCtx = document.getElementById('riskChart');
+            if (riskCtx) {
+                // Destroy existing chart if it exists
+                if (riskChart) {
+                    riskChart.destroy();
+                }
+                riskChart = new Chart(riskCtx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+                        datasets: [{
+                            data: [65, 28, 7], // Example data
+                            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                            borderColor: '#ffffff', // Border between slices
+                            borderWidth: 4, // Thicker border
+                            hoverOffset: 10 // Pop out effect on hover
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    font: {
+                                        size: 13,
+                                        weight: '500'
+                                    },
+                                    color: '#374151'
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed) {
+                                            label += context.parsed + '%'; // Assuming data is percentage
+                                        }
+                                        return label;
+                                    }
+                                },
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 14 },
+                                padding: 10,
+                                cornerRadius: 4
+                            }
+                        },
+                        cutout: '60%' // Adjust inner circle size
+                    }
+                });
+            }
+
+            // Throughput Chart
+            const throughputCtx = document.getElementById('throughputChart');
+            if (throughputCtx) {
+                // Destroy existing chart if it exists
+                if (throughputChart) {
+                    throughputChart.destroy();
+                }
+                throughputChart = new Chart(throughputCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Production', 'Processing', 'Distribution', 'Retail'],
+                        datasets: [{
+                            label: 'Throughput',
+                            data: [92, 88, 94, 86],
+                            backgroundColor: '#2563eb', // Solid color
+                            borderRadius: 6, // Rounded bars
+                            barPercentage: 0.7, // Control bar width
+                            categoryPercentage: 0.8 // Control spacing between categories
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.parsed.y + '%';
+                                    }
+                                },
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 14 },
+                                padding: 10,
+                                cornerRadius: 4
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false }, // Remove vertical grid lines
+                                ticks: {
+                                    color: '#6b7280'
+                                }
+                            },
+                            y: {
+                                min: 0,
+                                max: 100,
+                                grid: { 
+                                    color: '#e5e7eb', // Lighter horizontal grid lines
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%'; // Add percentage suffix
+                                    },
+                                    color: '#6b7280'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Cost Chart
+            const costCtx = document.getElementById('costChart');
+            if (costCtx) {
+                // Destroy existing chart if it exists
+                if (costChart) {
+                    costChart.destroy();
+                }
+                costChart = new Chart(costCtx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Cost Savings',
+                            data: [1.2, 1.8, 2.1, 2.3, 2.4, 2.4],
+                            borderColor: '#10b981',
+                            backgroundColor: (context) => {
+                                const chart = context.chart;
+                                const { ctx, chartArea } = chart;
+                                return getGradient(ctx, chartArea, 'rgba(16, 185, 129, 0.6)', 'rgba(16, 185, 129, 0)');
+                            },
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4, // Smooth curve
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#10b981',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': €' + context.parsed.y.toFixed(2) + 'M';
+                                    }
+                                },
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 14 },
+                                padding: 10,
+                                cornerRadius: 4
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: {
+                                    color: '#6b7280'
+                                }
+                            },
+                            y: {
+                                min: 0,
+                                grid: { 
+                                    color: '#e5e7eb',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return '€' + value + 'M'; // Add currency prefix and suffix
+                                    },
+                                    color: '#6b7280'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Three.js Digital Twin Visualization
+        function initializeThreeJS() {
+            const container = document.getElementById('threejs-container');
+            if (!container) return;
+            
+            // Scene setup
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf8fafc);
+            scene.fog = new THREE.Fog(0xf8fafc, 50, 200);
+
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 20, 40);
+
+            // Renderer setup
+            renderer = new THREE.WebGLRenderer({ 
+                antialias: true,
+                alpha: true
+            });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            // Lighting setup
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(20, 30, 20);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            // Create supply chain network
+            createSupplyChainNetwork();
+            
+            // Start animation loop
+            animate();
+
+            // Add camera controls
+            addCameraControls();
+        }
+
+        
+function createSupplyChainNetwork() {
+    const labelRenderer = new THREE.CSS2DRenderer();
+    const container = document.getElementById('threejs-container');
+    labelRenderer.setSize(container.clientWidth, container.clientHeight);
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.top = '0px';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    container.appendChild(labelRenderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    const nodes = [
+        { name: 'Production', position: [-20, 0, -10], color: 0x10b981 },
+        { name: 'Processing', position: [-5, 0, 5], color: 0x2563eb },
+        { name: 'Distribution', position: [15, 0, -5], color: 0xf59e0b },
+        { name: 'Quality Control', position: [0, 0, 15], color: 0x8b5cf6 },
+        { name: 'Logistics Hub', position: [10, 0, 20], color: 0xef4444 },
+        { name: 'Retail Network', position: [25, 0, 10], color: 0x06b6d4 }
+    ];
+
+    nodes.forEach((nodeData) => {
+        const geometry = new THREE.CylinderGeometry(2, 2, 4, 12);
+        const material = new THREE.MeshLambertMaterial({ color: nodeData.color });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(...nodeData.position);
+        mesh.userData = nodeData;
+        scene.add(mesh);
+        supplyChainData.push(mesh);
+
+        // Label
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'label';
+        labelDiv.textContent = nodeData.name;
+        const label = new THREE.CSS2DObject(labelDiv);
+        label.position.set(0, 3.5, 0);
+        mesh.add(label);
+    });
+
+    // Connections
+    for (let i = 0; i < nodes.length - 1; i++) {
+        const start = new THREE.Vector3(...nodes[i].position);
+        const end = new THREE.Vector3(...nodes[i + 1].position);
+        const curve = new THREE.QuadraticBezierCurve3(
+            start,
+            new THREE.Vector3((start.x + end.x) / 2, 10, (start.z + end.z) / 2),
+            end
+        );
+        const points = curve.getPoints(50);
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const material = new THREE.LineBasicMaterial({ color: 0x9ca3af, opacity: 0.5, transparent: true });
+        const line = new THREE.Line(geometry, material);
+        scene.add(line);
+    }
+
+    // Ground
+    const groundGeometry = new THREE.PlaneGeometry(100, 100);
+    const groundMaterial = new THREE.MeshLambertMaterial({ color: 0xe5e7eb, transparent: true, opacity: 0.3 });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -2;
+    scene.add(ground);
+
+    // Animate + render labels
+    function enhancedAnimate() {
+        animationId = requestAnimationFrame(enhancedAnimate);
+        controls.update();
+        renderer.render(scene, camera);
+        labelRenderer.render(scene, camera);
+    }
+
+    enhancedAnimate();
+}
+
+
+            // Add ground plane
+            const groundGeometry = new THREE.PlaneGeometry(100, 100);
+            const groundMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0xe5e7eb,
+                transparent: true,
+                opacity: 0.3
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+        }
+
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+
+            // Animate particles
+            supplyChainData.forEach(object => {
+                if (object.userData && object.userData.originalPosition) {
+                    const time = Date.now() * 0.001;
+                    object.position.y = object.userData.originalPosition.y + 
+                        Math.sin(time * object.userData.speed + object.userData.phase) * 2;
+                    object.rotation.y += 0.01;
+                }
+            });
+
+            // Rotate main nodes slowly
+            supplyChainData.forEach(object => {
+                if (object.userData && object.userData.type) {
+                    object.rotation.y += 0.005;
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        function addCameraControls() {
+            let isMouseDown = false;
+            let mouseX = 0;
+            let mouseY = 0;
+
+            const container = document.getElementById('threejs-container');
+
+            container.addEventListener('mousedown', onMouseDown);
+            container.addEventListener('mousemove', onMouseMove);
+            container.addEventListener('mouseup', onMouseUp);
+            container.addEventListener('wheel', onMouseWheel);
+
+            function onMouseDown(event) {
+                isMouseDown = true;
+                mouseX = event.clientX;
+                mouseY = event.clientY;
+            }
+
+            function onMouseMove(event) {
+                if (!isMouseDown) return;
+
+                const deltaX = event.clientX - mouseX;
+                const deltaY = event.clientY - mouseY;
+
+                const spherical = new THREE.Spherical();
+                spherical.setFromVector3(camera.position);
+                spherical.theta -= deltaX * 0.01;
+                spherical.phi += deltaY * 0.01;
+                spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi));
+                
+                camera.position.setFromSpherical(spherical);
+                camera.lookAt(0, 0, 0);
+
+                mouseX = event.clientX;
+                mouseY = event.clientY;
+            }
+
+            function onMouseUp() {
+                isMouseDown = false;
+            }
+
+            function onMouseWheel(event) {
+                event.preventDefault();
+                const zoom = event.deltaY > 0 ? 1.1 : 0.9;
+                camera.position.multiplyScalar(zoom);
+                
+                const distance = camera.position.length();
+                if (distance < 20) camera.position.normalize().multiplyScalar(20);
+                if (distance > 100) camera.position.normalize().multiplyScalar(100);
+            }
+        }
+
+        // UI Control Functions
+        function switchSupplyChain() {
+            const selector = document.getElementById('chainSelector');
+            const selectedChain = selector.value;
+            
+            digitalTwinEngine.alertSystem.addAlert('info', 'Supply Chain Switched', 
+                `Now monitoring ${selectedChain} supply chain network`);
+        }
+
+        function setViewMode(mode) {
+            currentViewMode = mode;
+            
+            // Update active button
+            document.querySelectorAll('.viewer-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            digitalTwinEngine.alertSystem.addAlert('info', 'View Mode Changed', 
+                `Switched to ${mode} visualization mode`);
+        }
+
+        function resetCamera() {
+            camera.position.set(0, 20, 40);
+            camera.lookAt(0, 0, 0);
+        }
+
+        function runAnalysis() {
+            showLoading();
+            
+            setTimeout(() => {
+                hideLoading();
+                digitalTwinEngine.alertSystem.addAlert('info', 'Analysis Complete', 
+                    'Supply chain analysis executed successfully. Efficiency improved by 2.3%');
+                
+                // Update metrics
+                digitalTwinEngine.metrics.efficiency += 2.3;
+                document.getElementById('efficiency-metric').textContent = digitalTwinEngine.metrics.efficiency.toFixed(1) + '%';
+            }, 2000);
+        }
+
+        function runSimulation() {
+            showLoading();
+            
+            setTimeout(() => {
+                hideLoading();
+                digitalTwinEngine.alertSystem.addAlert('warning', 'Simulation Results', 
+                    'Stress test completed. System can handle 150% load increase with 91% efficiency');
+            }, 2500);
+        }
+
+        function generateInsights() {
+            const insights = [
+                'AI recommends increasing buffer stock by 15% for grain products',
+                'Predictive model suggests route optimization could save €45K monthly',
+                'Quality control automation could reduce inspection time by 40%',
+                'Temperature sensors indicate 99.2% cold chain compliance',
+                'Demand forecasting accuracy improved to 94.7% with new model'
+            ];
+            
+            const randomInsight = insights[Math.floor(Math.random() * insights.length)];
+            digitalTwinEngine.alertSystem.addAlert('info', 'AI Insights', randomInsight);
+        }
+
+        function exportReport() {
+            digitalTwinEngine.alertSystem.addAlert('info', 'Report Generated', 
+                'Comprehensive digital twin report exported to PDF format');
+        }
+
+        function loadAlerts() {
+            // This function is called when the alerts tab is opened
+            digitalTwinEngine.alertSystem.renderAlerts();
+        }
+
+        function clearAlerts() {
+            digitalTwinEngine.alertSystem.alerts = [];
+            digitalTwinEngine.alertSystem.renderAlerts();
+        }
+
+        function exportAlerts() {
+            digitalTwinEngine.alertSystem.addAlert('info', 'Alerts Exported', 
+                'Alert history exported to CSV format');
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        // Initialize the platform
+        window.addEventListener('load', () => {
+            showLoading();
+            
+            setTimeout(() => {
+                digitalTwinEngine = new DigitalTwinEngine();
+                digitalTwinEngine.initialize();
+                initializeThreeJS();
+                
+                hideLoading();
+            }, 1500);
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const container = document.getElementById('threejs-container');
+            if (camera && renderer && container) {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }
+        });
+
+        // Keyboard shortcuts for professional users
+        document.addEventListener('keydown', (event) => {
+            if (event.ctrlKey || event.metaKey) {
+                switch(event.key.toLowerCase()) {
+                    case 'r':
+                        event.preventDefault();
+                        runAnalysis();
+                        break;
+                    case 's':
+                        event.preventDefault();
+                        runSimulation();
+                        break;
+                    case 'i':
+                        event.preventDefault();
+                        generateInsights();
+                        break;
+                    case 'e':
+                        event.preventDefault();
+                        exportReport();
+                        break;
+                }
+            }
+        });
+
+        console.log('SecureFood Digital Twin Platform - Professional Edition');
+        console.log('Developed by IRIS Technology Solutions');
+        console.log('Enterprise supply chain intelligence and predictive analytics');
+        console.log('Keyboard shortcuts: Ctrl+R (analyze), Ctrl+S (simulate), Ctrl+I (insights), Ctrl+E (export)');
+    </script>
+
+<div class="legend-box" id="legend">
+  <div><span class="legend-dot" style="background:#10b981;"></span>Production</div>
+  <div><span class="legend-dot" style="background:#2563eb;"></span>Processing</div>
+  <div><span class="legend-dot" style="background:#f59e0b;"></span>Distribution</div>
+  <div><span class="legend-dot" style="background:#8b5cf6;"></span>Quality Control</div>
+  <div><span class="legend-dot" style="background:#ef4444;"></span>Logistics Hub</div>
+  <div><span class="legend-dot" style="background:#06b6d4;"></span>Retail Network</div>
+</div>
+
+</body>
+</html>
