@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 const items = [
   { label: 'Dashboard', path: '/' },
   { label: 'Monitoring', path: '/monitoring' },
-  { label: 'Simulations', path: '/simulation' },      // note: your folder is singular
+  { label: 'Simulations', path: '/simulation' },
   { label: 'Data Integration', path: '/data-integration' },
   { label: 'Reports', path: '/reports' },
 ];
@@ -23,12 +24,24 @@ export default function Header() {
       justifyContent: 'space-between',
       padding: '0 30px',
       boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      position: 'sticky',
+      top: 0,
+      zIndex: 50,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ fontSize: 28 }}>🌾</div>
-        <div style={{ fontSize: 20, fontWeight: 700, color: '#FFFFFF' }}>SecureFood</div>
-      </div>
+      {/* Brand (logo) */}
+      <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {/* Using static import so it works perfectly on GitHub Pages */}
+        <Image
+          src="/securefood-logo.png"
+          alt="SecureFood"
+          width={160}         // tweak as you like
+          height={40}
+          priority
+          style={{ height: 40, width: 'auto' }}
+        />
+      </Link>
 
+      {/* Nav */}
       <nav style={{ display: 'flex', gap: 30 }}>
         {items.map(({ label, path }) => {
           const active = pathname === path || (path !== '/' && pathname.startsWith(path));
@@ -56,7 +69,7 @@ export default function Header() {
                   backgroundColor: '#C9A961',
                   borderRadius: 2,
                   display: 'block',
-                }}/>
+                }} />
               )}
             </Link>
           );
