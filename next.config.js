@@ -1,6 +1,6 @@
 // next.config.js
 const isProd = process.env.NODE_ENV === 'production';
-const repo = 'securefood-digital-twin'; // your repo name
+const repo = 'SecureFood'; // your repo name
 
 module.exports = {
   output: 'export',
