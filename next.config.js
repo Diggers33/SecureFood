@@ -1,11 +1,11 @@
 // next.config.js
 const isProd = process.env.NODE_ENV === 'production';
-const repo = 'securefood-digital-twin'; // <= your repo name
+const repo = 'securefood-digital-twin'; // your repo name
 
 module.exports = {
-  output: 'export',              // enables `next export`
-  images: { unoptimized: true }, // Pages has no image optimizer
+  output: 'export',
+  images: { unoptimized: true },
   basePath: isProd ? `/${repo}` : '',
   assetPrefix: isProd ? `/${repo}/` : '',
-  // trailingSlash: true, // uncomment if you hit 404s with static hosting
+  trailingSlash: true, // <--- add this
 };
