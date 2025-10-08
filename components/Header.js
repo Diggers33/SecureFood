@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import logo from '../public/securefood-logo.png'; // note the .. from /components to /public
+
 
 const items = [
   { label: 'Dashboard', path: '/' },
@@ -78,3 +80,4 @@ export default function Header() {
     </header>
   );
 }
+
