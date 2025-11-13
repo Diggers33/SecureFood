@@ -7,7 +7,7 @@ import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Upload, FileSpreadsheet, ChevronDown, Sparkles, TrendingUp, Activity, BarChart3, Zap, Target, Brain, Fish, Wheat, Apple, Milk, PlayCircle, Trash2, Copy, X } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Legend } from 'recharts';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { SavedSimulationsPanel, ComparisonView } from './SimulationComparisonPanel';
 
 type SimulationSector = 'fish' | 'aquaculture' | 'grain' | 'fruits' | 'dairy';
@@ -1072,20 +1072,27 @@ export default function SimulationsPage() {
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowSaveDialog(false);
+              setSimulationName('');
+            }
+          }}
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", duration: 0.3 }}
+            className="w-full max-w-md"
           >
-            <Card className="p-8 max-w-md w-full mx-4 shadow-2xl border-2 border-teal-200">
+            <Card className="p-8 shadow-2xl border-2 border-gray-200">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg" style={{ backgroundColor: '#2d6b6a' }}>
                   <PlayCircle className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg text-gray-800">Save Simulation</h3>
+                  <h3 className="text-gray-900">Save Simulation</h3>
                   <p className="text-xs text-gray-500">Enter a name for this simulation scenario</p>
                 </div>
               </div>
@@ -1093,8 +1100,8 @@ export default function SimulationsPage() {
               <div className="space-y-5">
                 {/* Current Configuration */}
                 <div className="p-4 rounded-xl border-2 border-gray-200" style={{ backgroundColor: '#f0f9f9' }}>
-                  <p className="text-xs text-gray-600 mb-2">Current Configuration</p>
-                  <div className="space-y-1">
+                  <p className="text-xs text-gray-600 mb-3">Current Configuration</p>
+                  <div className="space-y-2">
                     <div className="flex justify-between text-xs">
                       <span className="text-gray-500">Sector:</span>
                       <span className="text-gray-900">{sectors.find(s => s.id === selectedSector)?.name}</span>
@@ -1112,21 +1119,21 @@ export default function SimulationsPage() {
 
                 {/* Simulation Name */}
                 <div>
-                  <Label className="text-sm mb-3 block text-gray-700">Simulation Name</Label>
+                  <Label className="text-sm mb-2 block text-gray-700">Simulation Name</Label>
                   <Input 
                     placeholder="e.g., High Demand Scenario" 
-                    className="border-2 border-gray-200 rounded-xl"
-                    style={{ focusBorderColor: '#2d6b6a' }}
+                    className="border-2 border-gray-200 rounded-xl h-11 focus:border-teal-500"
                     value={simulationName}
                     onChange={(e) => setSimulationName(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSaveSimulation()}
+                    onKeyPress={(e) => e.key === 'Enter' && simulationName.trim() && handleSaveSimulation()}
+                    autoFocus
                   />
                 </div>
 
-                <div className="flex gap-3 mt-8">
+                <div className="flex gap-3 pt-2">
                   <Button
                     variant="outline"
-                    className="flex-1 border-2 hover:bg-gray-50 rounded-xl"
+                    className="flex-1 border-2 hover:bg-gray-50 rounded-xl h-11"
                     onClick={() => {
                       setShowSaveDialog(false);
                       setSimulationName('');
@@ -1135,8 +1142,8 @@ export default function SimulationsPage() {
                     Cancel
                   </Button>
                   <Button 
-                    className="flex-1 text-white shadow-lg rounded-xl"
-                    style={{ backgroundColor: '#2d6b6a' }}
+                    className="flex-1 text-white shadow-lg rounded-xl h-11 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ backgroundColor: simulationName.trim() ? '#2d6b6a' : '#94a3b8' }}
                     onClick={handleSaveSimulation}
                     disabled={!simulationName.trim()}
                   >
