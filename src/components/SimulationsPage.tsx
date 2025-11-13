@@ -7,7 +7,7 @@ import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Upload, FileSpreadsheet, ChevronDown, Sparkles, TrendingUp, Activity, BarChart3, Zap, Target, Brain, Fish, Wheat, Apple, Milk, PlayCircle, Trash2, Copy, X } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Legend } from 'recharts';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { SavedSimulationsPanel, ComparisonView } from './SimulationComparisonPanel';
 
 type SimulationSector = 'fish' | 'aquaculture' | 'grain' | 'fruits' | 'dairy';
