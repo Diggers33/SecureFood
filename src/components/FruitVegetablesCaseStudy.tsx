@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { ArrowLeft, Truck, Package, Apple, Store, Users, Factory, Warehouse, TrendingUp, TrendingDown, Thermometer, Clock } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
 type NodeType = 'farm' | 'bulk-transport' | 'processing' | 'packaging' | 

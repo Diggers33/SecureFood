@@ -6,7 +6,7 @@ import { Label } from './ui/label';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Download, Trash2, FileSpreadsheet, File, FileText, Folder, Clock, CheckCircle, Fish, Wheat, Apple, Milk, Activity } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 type ReportSector = 'fish' | 'aquaculture' | 'grain' | 'fruits' | 'dairy';
 

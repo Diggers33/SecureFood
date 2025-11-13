@@ -20,7 +20,7 @@ import {
   Droplets,
   X
 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
 type NodeType = 'fingerlings' | 'transport1' | 'aquaculture' | 'primary-processing' | 

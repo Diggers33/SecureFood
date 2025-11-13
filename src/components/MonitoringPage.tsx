@@ -24,7 +24,7 @@ import {
   Clock
 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import OtherSectorMonitoring from './OtherSectorMonitoring';
 
 // Sample data for Fish monitoring
