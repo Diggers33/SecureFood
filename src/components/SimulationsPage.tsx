@@ -951,17 +951,18 @@ export default function SimulationsPage() {
 
       {/* Upload Form Modal */}
       {showUploadForm && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+          className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", duration: 0.3 }}
           >
-            <Card className="p-8 max-w-md w-full mx-4 shadow-2xl border-2 border-purple-200">
+            <Card className="p-8 max-w-md w-full mx-4 shadow-2xl border-2 border-purple-200" style={{ backgroundColor: '#FFFFFF' }}>
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                   <Upload className="w-6 h-6 text-white" />
