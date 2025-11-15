@@ -1044,10 +1044,11 @@ export default function SimulationsPage() {
 
       {/* Save Simulation Dialog */}
       {showSaveDialog && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setShowSaveDialog(false);
@@ -1061,7 +1062,7 @@ export default function SimulationsPage() {
             transition={{ type: "spring", duration: 0.3 }}
             className="w-full max-w-md"
           >
-            <Card className="p-8 shadow-2xl border-2 border-gray-200">
+            <Card className="p-8 shadow-2xl border-2 border-gray-200" style={{ backgroundColor: '#FFFFFF' }}>
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg" style={{ backgroundColor: '#2d6b6a' }}>
                   <PlayCircle className="w-6 h-6 text-white" />
