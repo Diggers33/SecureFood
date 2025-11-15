@@ -442,31 +442,6 @@ export default function SimulationsPage() {
           <p className="text-sm text-gray-600">AI-powered predictive modeling and scenario analysis</p>
         </div>
 
-        {/* Sector Selection */}
-        <div className="mb-6 flex gap-3 flex-wrap">
-          {sectors.map((sector) => {
-            const Icon = sector.icon;
-            const isActive = selectedSector === sector.id;
-            return (
-              <motion.div key={sector.id} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant={isActive ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedSector(sector.id)}
-                  className={`h-11 text-sm transition-all duration-300 ${
-                    isActive
-                      ? `bg-gradient-to-r ${sector.gradient} hover:opacity-90 text-white shadow-lg scale-105 border-0`
-                      : `hover:border-${sector.color}-300 hover:bg-${sector.color}-50 border-2`
-                  }`}
-                >
-                  <Icon className="w-4 h-4 mr-2" />
-                  {sector.name}
-                </Button>
-              </motion.div>
-            );
-          })}
-        </div>
-
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-4">
           <TabsList className="bg-white mb-6 p-1.5 rounded-xl shadow-md border-2 border-gray-200">
