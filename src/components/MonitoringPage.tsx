@@ -24,7 +24,7 @@ import {
   Clock
 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import OtherSectorMonitoring from './OtherSectorMonitoring';
 
 // Sample data for Fish monitoring
@@ -112,8 +112,12 @@ const dairyColdChainData = [
 
 type MonitoringSector = 'fish' | 'aquaculture' | 'grain' | 'fruits' | 'dairy';
 
-export default function MonitoringPage() {
-  const [selectedSector, setSelectedSector] = useState<MonitoringSector>('fish');
+interface MonitoringPageProps {
+  initialSector?: MonitoringSector;
+}
+
+export default function MonitoringPage({ initialSector = 'fish' }: MonitoringPageProps) {
+  const [selectedSector, setSelectedSector] = useState<MonitoringSector>(initialSector);
   const [timeRange, setTimeRange] = useState('24h');
 
   const sectors = [
@@ -125,6 +129,7 @@ export default function MonitoringPage() {
   ];
 
   const currentSector = sectors.find(s => s.id === selectedSector);
+  const CurrentSectorIcon = currentSector?.icon || Activity;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -135,35 +140,21 @@ export default function MonitoringPage() {
             <Activity className="w-4 h-4 text-teal-600" />
             <span className="text-sm text-teal-700">Real-Time Analytics</span>
           </div>
-          <h1 className="text-4xl mb-2">
-            Supply Chain <span className="text-teal-600">Monitoring</span>
-          </h1>
-          <p className="text-sm text-gray-600">Real-time monitoring and early warning system across all supply chain sectors</p>
-        </div>
-
-        {/* Sector Selection */}
-        <div className="mb-6 flex gap-3 flex-wrap">
-          {sectors.map((sector) => {
-            const Icon = sector.icon;
-            const isActive = selectedSector === sector.id;
-            return (
-              <motion.div key={sector.id} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant={isActive ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedSector(sector.id)}
-                  className={`h-11 text-sm transition-all duration-300 ${
-                    isActive
-                      ? `bg-gradient-to-r ${sector.gradient} hover:opacity-90 text-white shadow-lg scale-105 border-0`
-                      : `hover:border-${sector.color}-300 hover:bg-${sector.color}-50 border-2`
-                  }`}
-                >
-                  <Icon className="w-4 h-4 mr-2" />
-                  {sector.name}
-                </Button>
-              </motion.div>
-            );
-          })}
+          
+          {/* Current Sector Indicator */}
+          <div className="flex items-center gap-4 mb-4">
+            <div 
+              className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br ${currentSector?.gradient}`}
+            >
+              <CurrentSectorIcon className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl mb-1">
+                {currentSector?.name.split(' - ')[0]} <span className="text-teal-600">Monitoring</span>
+              </h1>
+              <p className="text-sm text-gray-600">{currentSector?.name}</p>
+            </div>
+          </div>
         </div>
 
         {/* Time Range Selector */}

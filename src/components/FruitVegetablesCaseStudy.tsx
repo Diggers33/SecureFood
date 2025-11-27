@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
-import { ArrowLeft, Truck, Package, Apple, Store, Users, Factory, Warehouse, TrendingUp, TrendingDown, Thermometer, Clock } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import { Tooltip as UITooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
+import { ArrowLeft, Truck, Package, Apple, Store, Users, Factory, Warehouse, TrendingUp, TrendingDown, Thermometer, Clock, Droplets, AlertTriangle, Sun, CloudRain } from 'lucide-react';
+import { motion } from 'motion/react';
+import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 type NodeType = 'farm' | 'bulk-transport' | 'processing' | 'packaging' | 
   'wholesale' | 'logistics' | 'retailer' | 'consumers';
@@ -16,17 +17,180 @@ interface NodeData {
   gradient: string;
   description: string;
   position: { x: number; y: number };
+  kpis: {
+    name: string;
+    value: string;
+    trend?: 'up' | 'down' | 'stable';
+  }[];
+  metrics?: {
+    throughput: string;
+    efficiency: string;
+    quality: string;
+    cost: string;
+  };
 }
 
 const nodes: NodeData[] = [
-  { id: 'farm', icon: Apple, label: 'Farm', color: 'bg-teal-700', gradient: 'from-teal-600 to-teal-800', description: 'Fresh produce from Portuguese farms', position: { x: 50, y: 180 } },
-  { id: 'bulk-transport', icon: Truck, label: 'Bulk Transport', color: 'bg-teal-500', gradient: 'from-teal-400 to-teal-600', description: 'Transportation from farms to processing', position: { x: 160, y: 180 } },
-  { id: 'processing', icon: Package, label: 'Processing', color: 'bg-slate-500', gradient: 'from-slate-400 to-slate-600', description: 'Washing, sorting, and quality control', position: { x: 280, y: 180 } },
-  { id: 'packaging', icon: Factory, label: 'Packaging', color: 'bg-teal-600', gradient: 'from-teal-500 to-emerald-600', description: 'Consumer-ready packaging', position: { x: 400, y: 180 } },
-  { id: 'wholesale', icon: Warehouse, label: 'Wholesale', color: 'bg-slate-500', gradient: 'from-slate-400 to-slate-600', description: 'Wholesale distribution centers', position: { x: 520, y: 180 } },
-  { id: 'logistics', icon: Truck, label: 'Logistics', color: 'bg-teal-500', gradient: 'from-teal-400 to-teal-600', description: 'Cold chain distribution', position: { x: 640, y: 180 } },
-  { id: 'retailer', icon: Store, label: 'Retailer', color: 'bg-teal-600', gradient: 'from-teal-500 to-emerald-600', description: 'Supermarkets and retail stores', position: { x: 760, y: 180 } },
-  { id: 'consumers', icon: Users, label: 'Consumers', color: 'bg-slate-600', gradient: 'from-slate-500 to-slate-700', description: 'End consumers', position: { x: 880, y: 180 } },
+  { 
+    id: 'farm', 
+    icon: Apple, 
+    label: 'Farm', 
+    color: 'bg-teal-700', 
+    gradient: 'from-teal-600 to-teal-800', 
+    description: 'Fresh produce from Portuguese farms', 
+    position: { x: 50, y: 180 },
+    kpis: [
+      { name: 'Production Volume', value: '45k tons', trend: 'stable' },
+      { name: 'Crop Yield', value: '18 t/ha', trend: 'up' },
+      { name: 'Quality Grade', value: 'A+', trend: 'stable' }
+    ],
+    metrics: {
+      throughput: '45,000 tons/year',
+      efficiency: '92%',
+      quality: '96%',
+      cost: '€0.85/kg'
+    }
+  },
+  { 
+    id: 'bulk-transport', 
+    icon: Truck, 
+    label: 'Bulk Transport', 
+    color: 'bg-teal-500', 
+    gradient: 'from-teal-400 to-teal-600', 
+    description: 'Transportation from farms to processing', 
+    position: { x: 200, y: 180 },
+    kpis: [
+      { name: 'Transit Time', value: '3.2 hours', trend: 'down' },
+      { name: 'Capacity Util', value: '88%', trend: 'up' },
+      { name: 'On-Time Rate', value: '94%', trend: 'stable' }
+    ],
+    metrics: {
+      throughput: '43,200 tons/year',
+      efficiency: '88%',
+      quality: '95%',
+      cost: '€0.12/kg'
+    }
+  },
+  { 
+    id: 'processing', 
+    icon: Package, 
+    label: 'Processing', 
+    color: 'bg-slate-500', 
+    gradient: 'from-slate-400 to-slate-600', 
+    description: 'Washing, sorting, and quality control', 
+    position: { x: 350, y: 180 },
+    kpis: [
+      { name: 'Processing Rate', value: '280 kg/min', trend: 'up' },
+      { name: 'Quality Pass', value: '97%', trend: 'up' },
+      { name: 'Waste Rate', value: '4.2%', trend: 'down' }
+    ],
+    metrics: {
+      throughput: '41,400 tons/year',
+      efficiency: '95%',
+      quality: '97%',
+      cost: '€0.18/kg'
+    }
+  },
+  { 
+    id: 'packaging', 
+    icon: Factory, 
+    label: 'Packaging', 
+    color: 'bg-teal-600', 
+    gradient: 'from-teal-500 to-emerald-600', 
+    description: 'Consumer-ready packaging', 
+    position: { x: 500, y: 180 },
+    kpis: [
+      { name: 'Pack Speed', value: '650 units/hr', trend: 'stable' },
+      { name: 'Material Cost', value: '€0.15/unit', trend: 'up' },
+      { name: 'Line Efficiency', value: '91%', trend: 'stable' }
+    ],
+    metrics: {
+      throughput: '39,700 tons/year',
+      efficiency: '91%',
+      quality: '98%',
+      cost: '€0.22/kg'
+    }
+  },
+  { 
+    id: 'wholesale', 
+    icon: Warehouse, 
+    label: 'Wholesale', 
+    color: 'bg-slate-500', 
+    gradient: 'from-slate-400 to-slate-600', 
+    description: 'Wholesale distribution centers', 
+    position: { x: 650, y: 180 },
+    kpis: [
+      { name: 'Storage Volume', value: '38k tons', trend: 'stable' },
+      { name: 'Turnover Rate', value: '8.5x/year', trend: 'up' },
+      { name: 'Temp Control', value: '3.1°C avg', trend: 'stable' }
+    ],
+    metrics: {
+      throughput: '38,000 tons/year',
+      efficiency: '89%',
+      quality: '96%',
+      cost: '€0.08/kg storage'
+    }
+  },
+  { 
+    id: 'logistics', 
+    icon: Truck, 
+    label: 'Logistics', 
+    color: 'bg-teal-500', 
+    gradient: 'from-teal-400 to-teal-600', 
+    description: 'Cold chain distribution', 
+    position: { x: 800, y: 180 },
+    kpis: [
+      { name: 'Delivery Time', value: '8.4 hours', trend: 'down' },
+      { name: 'Cold Chain', value: '99.2%', trend: 'up' },
+      { name: 'Fuel Efficiency', value: '7.8 L/100km', trend: 'down' }
+    ],
+    metrics: {
+      throughput: '36,500 tons/year',
+      efficiency: '93%',
+      quality: '97%',
+      cost: '€0.16/kg'
+    }
+  },
+  { 
+    id: 'retailer', 
+    icon: Store, 
+    label: 'Retailer', 
+    color: 'bg-teal-600', 
+    gradient: 'from-teal-500 to-emerald-600', 
+    description: 'Supermarkets and retail stores', 
+    position: { x: 950, y: 180 },
+    kpis: [
+      { name: 'Sales Volume', value: '35k tons', trend: 'stable' },
+      { name: 'Shelf Life', value: '6.8 days avg', trend: 'up' },
+      { name: 'Waste Rate', value: '3.9%', trend: 'down' }
+    ],
+    metrics: {
+      throughput: '35,000 tons/year',
+      efficiency: '95%',
+      quality: '94%',
+      cost: '€2.85/kg retail'
+    }
+  },
+  { 
+    id: 'consumers', 
+    icon: Users, 
+    label: 'Consumers', 
+    color: 'bg-slate-600', 
+    gradient: 'from-slate-500 to-slate-700', 
+    description: 'End consumers', 
+    position: { x: 1100, y: 180 },
+    kpis: [
+      { name: 'Consumption', value: '34k tons', trend: 'stable' },
+      { name: 'Satisfaction', value: '89%', trend: 'up' },
+      { name: 'Price Index', value: '€2.85/kg', trend: 'up' }
+    ],
+    metrics: {
+      throughput: '34,000 tons/year',
+      efficiency: '97%',
+      quality: '93%',
+      cost: '€2.85/kg avg'
+    }
+  },
 ];
 
 const connections = [
@@ -40,12 +204,55 @@ const connections = [
 ];
 
 // Mock data for trend charts
-const tempTrendData = Array.from({ length: 20 }, (_, i) => ({ value: 3 + Math.sin(i * 0.5) * 1.5 + Math.random() * 0.5 }));
-const logisticsTrendData = Array.from({ length: 20 }, (_, i) => ({ value: 12 + Math.sin(i * 0.3) * 3 + Math.random() * 2 }));
-const wasteTrendData = Array.from({ length: 20 }, (_, i) => ({ value: 8 - i * 0.15 + Math.random() * 1.5 }));
+const tempTrendData = [
+  { name: 'Jan', value: 2.8 },
+  { name: 'Feb', value: 2.9 },
+  { name: 'Mar', value: 3.2 },
+  { name: 'Apr', value: 3.5 },
+  { name: 'May', value: 3.8 },
+  { name: 'Jun', value: 4.2 },
+  { name: 'Jul', value: 4.5 },
+  { name: 'Aug', value: 4.3 },
+  { name: 'Sep', value: 3.8 },
+  { name: 'Oct', value: 3.4 },
+  { name: 'Nov', value: 3.0 },
+  { name: 'Dec', value: 2.9 },
+];
+
+const logisticsTrendData = [
+  { name: 'Jan', value: 12.5 },
+  { name: 'Feb', value: 11.8 },
+  { name: 'Mar', value: 11.2 },
+  { name: 'Apr', value: 10.5 },
+  { name: 'May', value: 10.8 },
+  { name: 'Jun', value: 11.5 },
+  { name: 'Jul', value: 12.2 },
+  { name: 'Aug', value: 11.9 },
+  { name: 'Sep', value: 11.4 },
+  { name: 'Oct', value: 10.9 },
+  { name: 'Nov', value: 11.1 },
+  { name: 'Dec', value: 11.4 },
+];
+
+const wasteTrendData = [
+  { name: 'Jan', value: 8.2 },
+  { name: 'Feb', value: 7.8 },
+  { name: 'Mar', value: 7.5 },
+  { name: 'Apr', value: 7.0 },
+  { name: 'May', value: 6.8 },
+  { name: 'Jun', value: 6.2 },
+  { name: 'Jul', value: 5.8 },
+  { name: 'Aug', value: 5.5 },
+  { name: 'Sep', value: 5.3 },
+  { name: 'Oct', value: 5.1 },
+  { name: 'Nov', value: 5.0 },
+  { name: 'Dec', value: 5.2 },
+];
 
 export default function FruitVegetablesCaseStudy({ onBack }: { onBack?: () => void }) {
   const [hoveredNode, setHoveredNode] = useState<NodeType | null>(null);
+  const [selectedNode, setSelectedNode] = useState<NodeType | null>(null);
+  const [showDroughtStudy, setShowDroughtStudy] = useState(false);
 
   const getNodeById = (id: NodeType) => nodes.find(n => n.id === id);
 
@@ -66,27 +273,75 @@ export default function FruitVegetablesCaseStudy({ onBack }: { onBack?: () => vo
 
         {/* Header */}
         <div className="mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white shadow-sm rounded-full mb-4 border-2 border-teal-200">
-            <Apple className="w-4 h-4 text-teal-600" />
-            <span className="text-sm text-teal-700">Case Study 2</span>
+          {/* Sector Indicator */}
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-green-500 to-emerald-600">
+              <Apple className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl mb-1">
+                Fruits & Vegetables <span className="text-teal-600">Dashboard</span>
+              </h1>
+              <p className="text-sm text-gray-600">Fruits & Vegetables - Portugal</p>
+            </div>
           </div>
-          <h1 className="text-4xl mb-2">
-            Fruits & Vegetables{' '}
-            <span className="text-teal-600">Supply Chain - Portugal</span>
-          </h1>
+          
           <p className="text-gray-600 text-sm mb-4">
             Interactive visualization of the Portuguese fresh produce supply chain - hover over nodes for details
           </p>
+
+          {/* Controls */}
+          <div className="flex items-center gap-3 mb-4">
+            <UITooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={showDroughtStudy ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setShowDroughtStudy(!showDroughtStudy)}
+                  className={`h-10 text-sm transition-all duration-300 ${
+                    showDroughtStudy 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-md scale-105' 
+                      : 'hover:bg-orange-50 hover:border-orange-300'
+                  }`}
+                >
+                  <Droplets className="w-4 h-4 mr-2" />
+                  {showDroughtStudy ? 'Hide' : 'Show'} Drought Study Focus
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-xs bg-orange-800 text-white p-3 shadow-2xl">
+                <p className="text-xs leading-relaxed">
+                  Click to reveal the drought impact analysis for Portuguese agriculture, showing effects on crop yield, irrigation requirements, and quality concerns in affected regions.
+                </p>
+              </TooltipContent>
+            </UITooltip>
+          </div>
         </div>
 
         {/* Supply Chain Diagram */}
-        <Card className="p-8 bg-white/90 backdrop-blur-sm shadow-2xl border-2 border-teal-100 overflow-hidden">
-          <div className="relative" style={{ height: '400px' }}>
+        <Card className="p-8 bg-white/90 backdrop-blur-sm shadow-2xl border-2 border-teal-100 overflow-visible relative z-50">
+          <div className="relative overflow-visible pb-64" style={{ height: '440px' }}>
+            {/* Study Focus Box - Drought Impact Zone */}
+            {showDroughtStudy && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute left-8 top-16 w-[540px] h-[260px] border-4 border-dashed border-orange-400 rounded-xl bg-orange-50/30 pointer-events-none"
+              >
+                <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-orange-100 rounded-full border-2 border-orange-300">
+                  <span className="text-xs text-orange-700">🌡️ Study Focus: Drought Impact Zone</span>
+                </div>
+              </motion.div>
+            )}
+
             {/* SVG for connections */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 5 }}>
               <defs>
-                <marker id="arrowhead-fruit" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                  <polygon points="0 0, 10 3, 0 6" fill="#2d6b6a" />
+                {/* Arrowhead markers */}
+                <marker id="arrowhead-fruit" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+                  <path d="M0,0 L0,10 L10,5 z" fill="#14b8a6" />
+                </marker>
+                <marker id="arrowhead-fruit-active" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                  <path d="M0,0 L0,12 L12,6 z" fill="#0d9488" />
                 </marker>
               </defs>
               {connections.map((conn, idx) => {
@@ -94,23 +349,50 @@ export default function FruitVegetablesCaseStudy({ onBack }: { onBack?: () => vo
                 const toNode = getNodeById(conn.to as NodeType);
                 if (!fromNode || !toNode) return null;
 
-                const x1 = fromNode.position.x + 75;
-                const y1 = fromNode.position.y + 40;
-                const x2 = toNode.position.x + 5;
-                const y2 = toNode.position.y + 40;
+                const highlighted = selectedNode === conn.from || selectedNode === conn.to;
+                
+                // Node dimensions
+                const nodeWidth = 48;
+                const nodeHeight = 48;
+                
+                // Calculate start and end points at the edges of nodes
+                const fromCenterX = fromNode.position.x + nodeWidth / 2;
+                const fromCenterY = fromNode.position.y + nodeHeight / 2;
+                const toCenterX = toNode.position.x + nodeWidth / 2;
+                const toCenterY = toNode.position.y + nodeHeight / 2;
+                
+                // Standard horizontal connections - from right edge to left edge
+                const x1 = fromNode.position.x + nodeWidth;
+                const y1 = fromCenterY;
+                const x2 = toNode.position.x;
+                const y2 = toCenterY;
+                
+                // Calculate control points for smooth Bézier curve
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                const cx1 = x1 + dx * 0.5;
+                const cy1 = y1;
+                const cx2 = x1 + dx * 0.5;
+                const cy2 = y2;
+                
+                // Create smooth cubic Bézier path
+                const pathData = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
 
                 return (
-                  <motion.line
+                  <motion.path
                     key={idx}
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
-                    className={conn.color}
-                    strokeWidth="3"
-                    markerEnd="url(#arrowhead-fruit)"
+                    d={pathData}
+                    stroke={highlighted ? '#0d9488' : '#14b8a6'}
+                    strokeWidth={highlighted ? 3 : 2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                    markerEnd={highlighted ? 'url(#arrowhead-fruit-active)' : 'url(#arrowhead-fruit)'}
                     initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 1 }}
+                    animate={{ 
+                      pathLength: 1, 
+                      opacity: highlighted ? 0.9 : (selectedNode ? 0.2 : 0.5)
+                    }}
                     transition={{ duration: 0.5, delay: idx * 0.1 }}
                   />
                 );
@@ -121,6 +403,7 @@ export default function FruitVegetablesCaseStudy({ onBack }: { onBack?: () => vo
             {nodes.map((node, idx) => {
               const Icon = node.icon;
               const hovered = hoveredNode === node.id;
+              const selected = selectedNode === node.id;
 
               return (
                 <motion.div
@@ -132,10 +415,11 @@ export default function FruitVegetablesCaseStudy({ onBack }: { onBack?: () => vo
                   transition={{ duration: 0.3, delay: idx * 0.1 }}
                   onMouseEnter={() => setHoveredNode(node.id)}
                   onMouseLeave={() => setHoveredNode(null)}
+                  onClick={() => setSelectedNode(selected ? null : node.id)}
                 >
                   <div className="flex flex-col items-center">
                     <motion.div
-                      className={`w-20 h-20 bg-gradient-to-br ${node.gradient} rounded-2xl flex items-center justify-center shadow-xl cursor-pointer relative group`}
+                      className={`w-12 h-12 bg-gradient-to-br ${node.gradient} rounded-xl flex items-center justify-center shadow-xl cursor-pointer relative group`}
                       whileHover={{ scale: 1.1 }}
                       animate={{
                         scale: hovered ? 1.1 : 1,
@@ -145,20 +429,127 @@ export default function FruitVegetablesCaseStudy({ onBack }: { onBack?: () => vo
                       }}
                       transition={{ duration: 0.3 }}
                     >
-                      <Icon className="w-10 h-10 text-white drop-shadow-lg" />
+                      <Icon className="w-6 h-6 text-white drop-shadow-lg" />
                     </motion.div>
                     <p className="text-xs mt-3 text-center max-w-[120px] text-gray-700">
                       {node.label}
                     </p>
 
-                    {/* Hover tooltip */}
-                    {hovered && (
+                    {/* Hover/Click expandable tooltip with KPIs */}
+                    {(hovered || selected) && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="absolute top-24 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs p-3 rounded-lg shadow-xl z-30 w-48"
+                        animate={{ 
+                          opacity: 1, 
+                          y: 0,
+                          height: selected ? 'auto' : 'auto'
+                        }}
+                        onMouseEnter={() => setHoveredNode(node.id)}
+                        onMouseLeave={() => {
+                          if (!selected) {
+                            setHoveredNode(null);
+                          }
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!selected) {
+                            setSelectedNode(node.id);
+                          }
+                        }}
+                        className={`absolute top-24 left-1/2 transform -translate-x-1/2 bg-gradient-to-br from-gray-900 to-gray-800 text-white text-xs rounded-xl shadow-2xl border-2 transition-all ${
+                          selected 
+                            ? 'w-96 p-6 border-orange-400/50 z-[9999]' 
+                            : 'w-64 p-4 border-teal-500/30 cursor-pointer hover:border-teal-400/50 z-[9999]'
+                        }`}
                       >
-                        <p className="leading-relaxed">{node.description}</p>
+                        {/* Header */}
+                        <div className={`flex items-start justify-between ${selected ? 'mb-4 pb-3' : 'mb-3 pb-2'} border-b border-gray-700`}>
+                          <div className="flex-1">
+                            <p className={`text-teal-300 ${selected ? 'text-base mb-1.5' : 'mb-1'}`}>{node.label}</p>
+                            <p className={`text-gray-400 leading-relaxed ${selected ? 'text-xs' : 'text-[10px]'}`}>{node.description}</p>
+                          </div>
+                          {selected && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedNode(null);
+                              }}
+                              className="ml-3 w-6 h-6 rounded-full bg-gray-700 hover:bg-red-600 flex items-center justify-center transition-colors flex-shrink-0"
+                            >
+                              <span className="text-white text-sm">×</span>
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Compact view - first 3 KPIs */}
+                        {!selected && (
+                          <>
+                            <div className="space-y-2">
+                              {node.kpis.slice(0, 3).map((kpi, i) => (
+                                <div key={i} className="flex items-center justify-between">
+                                  <span className="text-[10px] text-gray-300">{kpi.name}</span>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-xs text-white">{kpi.value}</span>
+                                    {kpi.trend === 'up' && <TrendingUp className="w-3 h-3 text-orange-400" />}
+                                    {kpi.trend === 'down' && <TrendingDown className="w-3 h-3 text-red-400" />}
+                                    {kpi.trend === 'stable' && <span className="w-3 h-0.5 bg-gray-400 rounded"></span>}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="mt-3 pt-2 border-t border-gray-700 text-center">
+                              <p className="text-[9px] text-teal-400 hover:text-teal-300 transition-colors">Click to view detailed metrics</p>
+                            </div>
+                          </>
+                        )}
+
+                        {/* Expanded view - all KPIs and metrics */}
+                        {selected && (
+                          <>
+                            {/* All KPIs */}
+                            <div className="space-y-2.5 mb-4">
+                              {node.kpis.map((kpi, i) => (
+                                <div key={i} className="flex items-center justify-between bg-gray-800/50 p-2.5 rounded-lg">
+                                  <span className="text-xs text-gray-300">{kpi.name}</span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm text-white">{kpi.value}</span>
+                                    {kpi.trend === 'up' && <TrendingUp className="w-4 h-4 text-orange-400" />}
+                                    {kpi.trend === 'down' && <TrendingDown className="w-4 h-4 text-red-400" />}
+                                    {kpi.trend === 'stable' && <span className="w-4 h-0.5 bg-gray-400 rounded"></span>}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Performance Metrics */}
+                            {node.metrics && (
+                              <>
+                                <div className="border-t border-gray-700 pt-4 mb-3">
+                                  <p className="text-xs text-teal-300 mb-3">Performance Metrics</p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2.5">
+                                  <div className="bg-teal-900/30 p-2.5 rounded-lg border border-teal-700/30">
+                                    <p className="text-[10px] text-teal-400 mb-1">Throughput</p>
+                                    <p className="text-xs text-white">{node.metrics.throughput}</p>
+                                  </div>
+                                  <div className="bg-gray-800/50 p-2.5 rounded-lg border border-gray-700/30">
+                                    <p className="text-[10px] text-gray-400 mb-1">Efficiency</p>
+                                    <p className="text-xs text-white">{node.metrics.efficiency}</p>
+                                  </div>
+                                  <div className="bg-teal-900/30 p-2.5 rounded-lg border border-teal-700/30">
+                                    <p className="text-[10px] text-teal-400 mb-1">Quality</p>
+                                    <p className="text-xs text-white">{node.metrics.quality}</p>
+                                  </div>
+                                  <div className="bg-gray-800/50 p-2.5 rounded-lg border border-gray-700/30">
+                                    <p className="text-[10px] text-gray-400 mb-1">Cost</p>
+                                    <p className="text-xs text-white">{node.metrics.cost}</p>
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                          </>
+                        )}
+
                         <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-900"></div>
                       </motion.div>
                     )}
@@ -168,6 +559,55 @@ export default function FruitVegetablesCaseStudy({ onBack }: { onBack?: () => vo
             })}
           </div>
         </Card>
+
+        {/* Drought Impact Analysis */}
+        {showDroughtStudy && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-6"
+          >
+            <Card className="p-6 bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 border-2 border-orange-200 shadow-xl">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <Droplets className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg mb-3 text-orange-900">Drought Impact & Climate Analysis</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-orange-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Sun className="w-4 h-4 text-orange-600" />
+                        <h4 className="text-sm text-gray-800">Crop Yield Reduction</h4>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-relaxed">
+                        Extended dry periods reducing harvest volumes by 15-20% in southern growing regions, affecting farm output and quality grades.
+                      </p>
+                    </div>
+                    <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-orange-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Droplets className="w-4 h-4 text-orange-600" />
+                        <h4 className="text-sm text-gray-800">Irrigation Challenges</h4>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-relaxed">
+                        Water scarcity increasing irrigation costs and operational complexity, forcing farms to prioritize high-value crops.
+                      </p>
+                    </div>
+                    <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-orange-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="w-4 h-4 text-orange-600" />
+                        <h4 className="text-sm text-gray-800">Quality Concerns</h4>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-relaxed">
+                        Heat stress and irregular rainfall patterns affecting produce quality, shelf life, and consumer satisfaction metrics.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Metrics and Trends */}
         <div className="grid grid-cols-4 gap-4 mt-6">
@@ -244,27 +684,99 @@ export default function FruitVegetablesCaseStudy({ onBack }: { onBack?: () => vo
         <div className="grid grid-cols-3 gap-6 mt-6">
           <Card className="p-6 bg-gradient-to-br from-blue-50/50 to-white border-2 border-blue-100">
             <h3 className="text-sm mb-4 text-blue-900">Cold Chain Temperature Trend</h3>
-            <ResponsiveContainer width="100%" height={120}>
-              <LineChart data={tempTrendData}>
-                <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} dot={false} />
+            <ResponsiveContainer width="100%" height={160}>
+              <LineChart data={tempTrendData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 10, fill: '#6b7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#d1d5db' }}
+                />
+                <YAxis 
+                  domain={[2, 5]} 
+                  tick={{ fontSize: 10, fill: '#6b7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#d1d5db' }}
+                  label={{ value: '°C', position: 'insideLeft', style: { fontSize: 10, fill: '#6b7280' } }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1f2937', 
+                    border: 'none', 
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    color: '#fff'
+                  }}
+                  formatter={(value: any) => [`${value.toFixed(1)}°C`, 'Temperature']}
+                />
+                <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </Card>
 
           <Card className="p-6 bg-gradient-to-br from-orange-50/50 to-white border-2 border-orange-100">
             <h3 className="text-sm mb-4 text-orange-900">Logistics Delay Trend</h3>
-            <ResponsiveContainer width="100%" height={120}>
-              <LineChart data={logisticsTrendData}>
-                <Line type="monotone" dataKey="value" stroke="#f97316" strokeWidth={3} dot={false} />
+            <ResponsiveContainer width="100%" height={160}>
+              <LineChart data={logisticsTrendData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 10, fill: '#6b7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#d1d5db' }}
+                />
+                <YAxis 
+                  domain={[10, 13]} 
+                  tick={{ fontSize: 10, fill: '#6b7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#d1d5db' }}
+                  label={{ value: 'hours', position: 'insideLeft', style: { fontSize: 10, fill: '#6b7280' } }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1f2937', 
+                    border: 'none', 
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    color: '#fff'
+                  }}
+                  formatter={(value: any) => [`${value.toFixed(1)}h`, 'Delay']}
+                />
+                <Line type="monotone" dataKey="value" stroke="#f97316" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </Card>
 
           <Card className="p-6 bg-gradient-to-br from-emerald-50/50 to-white border-2 border-emerald-100">
             <h3 className="text-sm mb-4 text-emerald-900">Waste Reduction Trend</h3>
-            <ResponsiveContainer width="100%" height={120}>
-              <LineChart data={wasteTrendData}>
-                <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={3} dot={false} />
+            <ResponsiveContainer width="100%" height={160}>
+              <LineChart data={wasteTrendData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 10, fill: '#6b7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#d1d5db' }}
+                />
+                <YAxis 
+                  domain={[4, 9]} 
+                  tick={{ fontSize: 10, fill: '#6b7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#d1d5db' }}
+                  label={{ value: '%', position: 'insideLeft', style: { fontSize: 10, fill: '#6b7280' } }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1f2937', 
+                    border: 'none', 
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    color: '#fff'
+                  }}
+                  formatter={(value: any) => [`${value.toFixed(1)}%`, 'Waste']}
+                />
+                <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </Card>

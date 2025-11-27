@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
+import { Tooltip as UITooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 import { 
   Factory, 
   Truck, 
@@ -19,10 +20,13 @@ import {
   TrendingUp,
   TrendingDown,
   Thermometer,
-  Droplets
+  Droplets,
+  ZoomIn,
+  ZoomOut,
+  Maximize2
 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import { motion } from 'motion/react';
+import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 type NodeType = 'farm' | 'logistics' | 'elevator-sea' | 'elevator-field' | 'ship' | 
   'foreign' | 'mills' | 'packaging' | 'distribution' | 'retailer' | 'consumer' | 
@@ -59,7 +63,7 @@ const nodes: NodeData[] = [
     gradient: 'from-teal-500 to-teal-700', 
     hoverColor: 'hover:bg-teal-700', 
     description: 'Grain production from Ukrainian farms', 
-    position: { x: 50, y: 200 },
+    position: { x: 40, y: 200 },
     kpis: [
       { name: 'Production Volume', value: '450k tons', trend: 'down' },
       { name: 'Yield Rate', value: '4.2 t/ha', trend: 'stable' },
@@ -80,7 +84,7 @@ const nodes: NodeData[] = [
     gradient: 'from-slate-400 to-slate-600', 
     hoverColor: 'hover:bg-slate-600', 
     description: 'Transportation from farm to elevators', 
-    position: { x: 200, y: 200 },
+    position: { x: 220, y: 200 },
     kpis: [
       { name: 'Transport Capacity', value: '425k tons', trend: 'down' },
       { name: 'Delivery Time', value: '2.3 days', trend: 'up' },
@@ -98,20 +102,20 @@ const nodes: NodeData[] = [
     icon: Building2, 
     label: 'Grain Elevator (Sea)', 
     color: 'bg-teal-600', 
-    gradient: 'from-teal-500 to-emerald-600', 
+    gradient: 'from-teal-500 to-teal-700', 
     hoverColor: 'hover:bg-teal-700', 
-    description: 'Storage and processing near seaports', 
-    position: { x: 350, y: 100 },
+    description: 'Storage near Black Sea ports', 
+    position: { x: 400, y: 100 },
     kpis: [
-      { name: 'Storage Capacity', value: '125k tons', trend: 'stable' },
-      { name: 'Turnover Rate', value: '3.2x/year', trend: 'down' },
-      { name: 'Moisture Control', value: '12.1%', trend: 'stable' }
+      { name: 'Storage Capacity', value: '380k tons', trend: 'stable' },
+      { name: 'Utilization', value: '72%', trend: 'down' },
+      { name: 'Drying Efficiency', value: '94%', trend: 'stable' }
     ],
     metrics: {
-      throughput: '125,000 tons capacity',
-      efficiency: '82%',
+      throughput: '380,000 tons/year',
+      efficiency: '72%',
       quality: '94%',
-      cost: '€15/ton storage'
+      cost: '€12/ton storage'
     }
   },
   { 
@@ -119,62 +123,62 @@ const nodes: NodeData[] = [
     icon: Building2, 
     label: 'Grain Elevator (Field)', 
     color: 'bg-teal-600', 
-    gradient: 'from-teal-500 to-emerald-600', 
+    gradient: 'from-teal-500 to-teal-700', 
     hoverColor: 'hover:bg-teal-700', 
-    description: 'Storage near production area', 
-    position: { x: 350, y: 300 },
+    description: 'Storage near production areas', 
+    position: { x: 400, y: 300 },
     kpis: [
-      { name: 'Storage Capacity', value: '200k tons', trend: 'stable' },
-      { name: 'Utilization', value: '88%', trend: 'up' },
-      { name: 'Processing Speed', value: '150 t/hr', trend: 'stable' }
+      { name: 'Storage Capacity', value: '185k tons', trend: 'stable' },
+      { name: 'Utilization', value: '89%', trend: 'up' },
+      { name: 'Quality Control', value: '96%', trend: 'stable' }
     ],
     metrics: {
-      throughput: '200,000 tons capacity',
-      efficiency: '88%',
-      quality: '93%',
-      cost: '€12/ton storage'
+      throughput: '185,000 tons/year',
+      efficiency: '89%',
+      quality: '96%',
+      cost: '€10/ton storage'
     }
   },
   { 
     id: 'ship', 
     icon: Ship, 
-    label: 'Loading on Ship', 
-    color: 'bg-teal-600', 
-    gradient: 'from-teal-500 to-teal-700', 
-    hoverColor: 'hover:bg-teal-700', 
-    description: 'Bulk loading for export', 
-    position: { x: 500, y: 100 },
+    label: 'Shipping', 
+    color: 'bg-slate-500', 
+    gradient: 'from-slate-400 to-slate-600', 
+    hoverColor: 'hover:bg-slate-600', 
+    description: 'Maritime transport', 
+    position: { x: 580, y: 100 },
     kpis: [
-      { name: 'Export Volume', value: '2.4M tons', trend: 'down' },
-      { name: 'Loading Rate', value: '1,200 t/hr', trend: 'down' },
-      { name: 'Ship Delays', value: '18 days avg', trend: 'up' }
+      { name: 'Shipping Volume', value: '340k tons', trend: 'down' },
+      { name: 'Transit Time', value: '14 days avg', trend: 'up' },
+      { name: 'Port Delays', value: '3.5 days', trend: 'up' }
     ],
     metrics: {
-      throughput: '2.4M tons/year',
-      efficiency: '62%',
-      quality: '96%',
-      cost: '€28/ton'
+      throughput: '340,000 tons/year',
+      efficiency: '68%',
+      quality: '93%',
+      cost: '€35/ton freight'
     }
   },
   { 
     id: 'foreign', 
-    icon: Users, 
-    label: 'Foreign Partners', 
-    color: 'bg-slate-600', 
-    gradient: 'from-slate-500 to-slate-700', 
-    hoverColor: 'hover:bg-slate-700', 
-    description: 'International grain buyers', 
-    position: { x: 650, y: 100 },
+    icon: Factory, 
+    label: 'Foreign Mills', 
+    color: 'bg-teal-600', 
+    gradient: 'from-teal-500 to-emerald-600', 
+    hoverColor: 'hover:bg-teal-700', 
+    description: 'International processing', 
+    position: { x: 760, y: 100 },
     kpis: [
-      { name: 'Contract Volume', value: '2.2M tons', trend: 'down' },
-      { name: 'Price Premium', value: '€285/ton', trend: 'up' },
-      { name: 'Market Share', value: '15%', trend: 'stable' }
+      { name: 'Processing', value: '320k tons', trend: 'down' },
+      { name: 'Flour Output', value: '256k tons', trend: 'down' },
+      { name: 'Export Demand', value: 'High', trend: 'stable' }
     ],
     metrics: {
-      throughput: '2.2M tons/year',
-      efficiency: '91%',
-      quality: '97%',
-      cost: '€285/ton avg'
+      throughput: '320,000 tons/year',
+      efficiency: '82%',
+      quality: '94%',
+      cost: '€45/ton milling'
     }
   },
   { 
@@ -184,18 +188,60 @@ const nodes: NodeData[] = [
     color: 'bg-teal-600', 
     gradient: 'from-teal-500 to-emerald-600', 
     hoverColor: 'hover:bg-teal-700', 
-    description: 'Flour production facilities', 
-    position: { x: 650, y: 300 },
+    description: 'Grain processing to flour', 
+    position: { x: 760, y: 300 },
     kpis: [
-      { name: 'Milling Capacity', value: '180k tons', trend: 'stable' },
-      { name: 'Extraction Rate', value: '76%', trend: 'up' },
-      { name: 'Product Quality', value: '94%', trend: 'stable' }
+      { name: 'Processing Rate', value: '175k tons', trend: 'stable' },
+      { name: 'Flour Yield', value: '76%', trend: 'stable' },
+      { name: 'Quality Grade', value: 'A', trend: 'up' }
     ],
     metrics: {
-      throughput: '180,000 tons/year',
-      efficiency: '85%',
+      throughput: '175,000 tons/year',
+      efficiency: '91%',
+      quality: '97%',
+      cost: '€42/ton milling'
+    }
+  },
+  { 
+    id: 'feed-mills', 
+    icon: Factory, 
+    label: 'Feed Mills', 
+    color: 'bg-slate-500', 
+    gradient: 'from-slate-400 to-slate-600', 
+    hoverColor: 'hover:bg-slate-600', 
+    description: 'Animal feed production', 
+    position: { x: 940, y: 400 },
+    kpis: [
+      { name: 'Processing Rate', value: '95k tons', trend: 'stable' },
+      { name: 'Mix Quality', value: '94%', trend: 'up' },
+      { name: 'Feed Conversion', value: '1.8:1', trend: 'stable' }
+    ],
+    metrics: {
+      throughput: '95,000 tons/year',
+      efficiency: '91%',
+      quality: '96%',
+      cost: '€38/ton processing'
+    }
+  },
+  { 
+    id: 'livestock', 
+    icon: Users, 
+    label: 'Livestock Farms', 
+    color: 'bg-slate-600', 
+    gradient: 'from-slate-500 to-slate-700', 
+    hoverColor: 'hover:bg-slate-700', 
+    description: 'Animal agriculture', 
+    position: { x: 1120, y: 400 },
+    kpis: [
+      { name: 'Feed Consumption', value: '92k tons', trend: 'stable' },
+      { name: 'Animal Growth', value: '+12% avg', trend: 'up' },
+      { name: 'Feed Efficiency', value: '2.8:1', trend: 'stable' }
+    ],
+    metrics: {
+      throughput: '92,000 tons/year',
+      efficiency: '88%',
       quality: '94%',
-      cost: '€45/ton processing'
+      cost: '€240/ton livestock'
     }
   },
   { 
@@ -206,7 +252,7 @@ const nodes: NodeData[] = [
     gradient: 'from-teal-500 to-teal-700', 
     hoverColor: 'hover:bg-teal-700', 
     description: 'Consumer packaging', 
-    position: { x: 800, y: 300 },
+    position: { x: 940, y: 300 },
     kpis: [
       { name: 'Packaging Speed', value: '850 units/hr', trend: 'stable' },
       { name: 'Material Cost', value: '€0.18/unit', trend: 'up' },
@@ -227,7 +273,7 @@ const nodes: NodeData[] = [
     gradient: 'from-slate-400 to-slate-600', 
     hoverColor: 'hover:bg-slate-600', 
     description: 'Distribution logistics', 
-    position: { x: 950, y: 300 },
+    position: { x: 1120, y: 300 },
     kpis: [
       { name: 'Delivery Coverage', value: '450 outlets', trend: 'up' },
       { name: 'On-Time Rate', value: '92%', trend: 'stable' },
@@ -247,81 +293,39 @@ const nodes: NodeData[] = [
     color: 'bg-teal-600', 
     gradient: 'from-teal-500 to-emerald-600', 
     hoverColor: 'hover:bg-teal-700', 
-    description: 'Retail and wholesale outlets', 
-    position: { x: 1100, y: 300 },
+    description: 'Retail distribution', 
+    position: { x: 1300, y: 300 },
     kpis: [
       { name: 'Sales Volume', value: '155k tons', trend: 'stable' },
-      { name: 'Inventory Turn', value: '12x/year', trend: 'up' },
-      { name: 'Waste Rate', value: '2.1%', trend: 'down' }
+      { name: 'Shelf Turnover', value: '12x/year', trend: 'up' },
+      { name: 'Stock Accuracy', value: '96%', trend: 'stable' }
     ],
     metrics: {
       throughput: '155,000 tons/year',
       efficiency: '94%',
-      quality: '96%',
-      cost: '€420/ton retail'
+      quality: '95%',
+      cost: '€8/ton handling'
     }
   },
   { 
     id: 'consumer', 
     icon: Users, 
-    label: 'Ukrainian Consumers', 
+    label: 'End Consumer', 
     color: 'bg-slate-600', 
     gradient: 'from-slate-500 to-slate-700', 
     hoverColor: 'hover:bg-slate-700', 
-    description: 'Domestic market', 
-    position: { x: 1250, y: 300 },
+    description: 'Consumer market', 
+    position: { x: 1480, y: 300 },
     kpis: [
-      { name: 'Consumption', value: '152k tons', trend: 'stable' },
-      { name: 'Price Index', value: '€1.85/kg', trend: 'up' },
+      { name: 'Consumption', value: '150k tons', trend: 'stable' },
+      { name: 'Price Index', value: '€2.45/kg', trend: 'up' },
       { name: 'Satisfaction', value: '87%', trend: 'stable' }
     ],
     metrics: {
-      throughput: '152,000 tons/year',
-      efficiency: '98%',
-      quality: '95%',
-      cost: '€1.85/kg avg'
-    }
-  },
-  { 
-    id: 'feed-mills', 
-    icon: Factory, 
-    label: 'Feed Mills', 
-    color: 'bg-teal-600', 
-    gradient: 'from-teal-500 to-emerald-600', 
-    hoverColor: 'hover:bg-teal-700', 
-    description: 'Animal feed production', 
-    position: { x: 650, y: 450 },
-    kpis: [
-      { name: 'Feed Production', value: '95k tons', trend: 'stable' },
-      { name: 'Protein Content', value: '18.5%', trend: 'stable' },
-      { name: 'Batch Quality', value: '96%', trend: 'up' }
-    ],
-    metrics: {
-      throughput: '95,000 tons/year',
-      efficiency: '91%',
-      quality: '96%',
-      cost: '€38/ton processing'
-    }
-  },
-  { 
-    id: 'livestock', 
-    icon: Users, 
-    label: 'Livestock Farms', 
-    color: 'bg-slate-600', 
-    gradient: 'from-slate-500 to-slate-700', 
-    hoverColor: 'hover:bg-slate-700', 
-    description: 'Animal agriculture', 
-    position: { x: 800, y: 450 },
-    kpis: [
-      { name: 'Feed Consumption', value: '92k tons', trend: 'stable' },
-      { name: 'Animal Growth', value: '+12% avg', trend: 'up' },
-      { name: 'Feed Efficiency', value: '2.8:1', trend: 'stable' }
-    ],
-    metrics: {
-      throughput: '92,000 tons/year',
-      efficiency: '88%',
-      quality: '94%',
-      cost: '€240/ton livestock'
+      throughput: '150,000 tons/year',
+      efficiency: '97%',
+      quality: '93%',
+      cost: '€2.45/kg avg'
     }
   },
 ];
@@ -353,6 +357,7 @@ export default function GrainCaseStudy({ onBack }: { onBack?: () => void }) {
   const [hoveredNode, setHoveredNode] = useState<NodeType | null>(null);
   const [selectedNode, setSelectedNode] = useState<NodeType | null>(null);
   const [selectedPath, setSelectedPath] = useState<'export' | 'domestic' | 'feed' | null>(null);
+  const [zoom, setZoom] = useState(0.75);
   const [showRisks, setShowRisks] = useState(false);
 
   const getNodeById = (id: NodeType) => nodes.find(n => n.id === id);
@@ -371,9 +376,50 @@ export default function GrainCaseStudy({ onBack }: { onBack?: () => void }) {
   };
 
   // Mock data for trend charts
-  const moistureTrendData = Array.from({ length: 20 }, (_, i) => ({ value: 12 + Math.sin(i * 0.4) * 1.5 + Math.random() * 0.5 }));
-  const storageTempTrendData = Array.from({ length: 20 }, (_, i) => ({ value: 18 + Math.sin(i * 0.5) * 3 + Math.random() * 0.8 }));
-  const disruptionTrendData = Array.from({ length: 20 }, (_, i) => ({ value: 85 - i * 1.5 + Math.random() * 5 }));
+  const moistureTrendData = [
+    { name: 'Jan', value: 11.5 },
+    { name: 'Feb', value: 11.8 },
+    { name: 'Mar', value: 12.2 },
+    { name: 'Apr', value: 12.5 },
+    { name: 'May', value: 12.8 },
+    { name: 'Jun', value: 13.2 },
+    { name: 'Jul', value: 12.9 },
+    { name: 'Aug', value: 12.3 },
+    { name: 'Sep', value: 11.8 },
+    { name: 'Oct', value: 11.5 },
+    { name: 'Nov', value: 12.0 },
+    { name: 'Dec', value: 12.3 },
+  ];
+
+  const storageTempTrendData = [
+    { name: 'Jan', value: 16.5 },
+    { name: 'Feb', value: 17.2 },
+    { name: 'Mar', value: 18.0 },
+    { name: 'Apr', value: 19.5 },
+    { name: 'May', value: 21.0 },
+    { name: 'Jun', value: 22.5 },
+    { name: 'Jul', value: 23.8 },
+    { name: 'Aug', value: 22.0 },
+    { name: 'Sep', value: 20.5 },
+    { name: 'Oct', value: 19.0 },
+    { name: 'Nov', value: 17.5 },
+    { name: 'Dec', value: 16.8 },
+  ];
+
+  const disruptionTrendData = [
+    { name: 'Jan', value: 85 },
+    { name: 'Feb', value: 82 },
+    { name: 'Mar', value: 78 },
+    { name: 'Apr', value: 75 },
+    { name: 'May', value: 72 },
+    { name: 'Jun', value: 70 },
+    { name: 'Jul', value: 68 },
+    { name: 'Aug', value: 65 },
+    { name: 'Sep', value: 64 },
+    { name: 'Oct', value: 66 },
+    { name: 'Nov', value: 67 },
+    { name: 'Dec', value: 68 },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -392,14 +438,19 @@ export default function GrainCaseStudy({ onBack }: { onBack?: () => void }) {
 
         {/* Header */}
         <div className="mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white shadow-sm rounded-full mb-4 border-2 border-teal-200">
-            <Wheat className="w-4 h-4 text-teal-600" />
-            <span className="text-sm text-teal-700">Case Study 1</span>
+          {/* Sector Indicator */}
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-amber-500 to-orange-600">
+              <Wheat className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl mb-1">
+                Grain <span className="text-teal-600">Dashboard</span>
+              </h1>
+              <p className="text-sm text-gray-600">Grain - Ukraine</p>
+            </div>
           </div>
-          <h1 className="text-4xl mb-2">
-            Grain Supply Chain{' '}
-            <span className="text-teal-600">- Ukraine</span>
-          </h1>
+          
           <p className="text-gray-600 text-sm mb-4">
             Interactive visualization of the grain supply chain - hover over nodes for details, click path buttons to highlight routes
           </p>
@@ -447,31 +498,60 @@ export default function GrainCaseStudy({ onBack }: { onBack?: () => void }) {
             <Factory className="w-4 h-4 mr-2" />
             Feed Production
           </Button>
-          <div className="h-8 w-px bg-gray-300 mx-2"></div>
-          <Button
-            variant={showRisks ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setShowRisks(!showRisks)}
-            className={`h-10 text-sm transition-all duration-300 ${
-              showRisks 
-                ? 'bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 shadow-md scale-105' 
-                : 'hover:bg-slate-50 hover:border-slate-300'
-            }`}
-          >
-            <AlertTriangle className="w-4 h-4 mr-2" />
-            {showRisks ? 'Hide' : 'Show'} Risk Analysis
-          </Button>
         </div>
 
         {/* Supply Chain Diagram */}
-        <Card className="p-8 bg-white/90 backdrop-blur-sm shadow-2xl border-2 border-teal-100 overflow-visible relative z-50">
-          <div className="relative overflow-visible pb-64" style={{ height: '520px' }}>
+        <Card className="p-8 bg-white/90 backdrop-blur-sm shadow-2xl border-2 border-teal-100 overflow-hidden relative z-50">
+          {/* Zoom Controls */}
+          <div className="absolute top-4 right-4 z-[100] flex gap-2 bg-white/90 backdrop-blur-sm p-2 rounded-xl shadow-lg border border-teal-200">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setZoom(Math.min(zoom + 0.1, 1.5))}
+              disabled={zoom >= 1.5}
+              className="h-8 w-8 p-0"
+              title="Zoom In"
+            >
+              <ZoomIn className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setZoom(Math.max(zoom - 0.1, 0.5))}
+              disabled={zoom <= 0.5}
+              className="h-8 w-8 p-0"
+              title="Zoom Out"
+            >
+              <ZoomOut className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setZoom(0.75)}
+              className="h-8 w-8 p-0"
+              title="Reset Zoom"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </Button>
+            <div className="flex items-center px-2 text-xs text-gray-600 border-l border-gray-300 ml-1">
+              {Math.round(zoom * 100)}%
+            </div>
+          </div>
+
+          <div 
+            className="relative overflow-visible pb-64 transition-transform duration-300 origin-top-left" 
+            style={{ 
+              height: '560px', 
+              transform: `scale(${zoom})`,
+              width: `${100 / zoom}%`
+            }}
+          >
             {/* Study Area Box */}
             {showRisks && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="absolute left-8 top-12 w-[640px] h-[280px] border-4 border-dashed border-slate-400 rounded-xl bg-slate-50/30 pointer-events-none"
+                className="absolute left-8 top-16 w-[640px] h-[260px] border-4 border-dashed border-slate-400 rounded-xl bg-slate-50/30 pointer-events-none"
               >
                 <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-slate-100 rounded-full border-2 border-slate-300">
                   <span className="text-xs text-slate-700">⚠️ Study Focus: War Impact Zone</span>
@@ -480,13 +560,14 @@ export default function GrainCaseStudy({ onBack }: { onBack?: () => void }) {
             )}
 
             {/* SVG for connections */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 5 }}>
               <defs>
-                <marker id="arrowhead-grain" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                  <polygon points="0 0, 10 3, 0 6" fill="#2d6b6a" />
+                {/* Arrowhead markers */}
+                <marker id="arrowhead-grain" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+                  <path d="M0,0 L0,10 L10,5 z" fill="#14b8a6" />
                 </marker>
-                <marker id="arrowhead-grain-active" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                  <polygon points="0 0, 10 3, 0 6" fill="#2d6b6a" />
+                <marker id="arrowhead-grain-active" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                  <path d="M0,0 L0,12 L12,6 z" fill="#0d9488" />
                 </marker>
               </defs>
               {connections.map((conn, idx) => {
@@ -495,25 +576,102 @@ export default function GrainCaseStudy({ onBack }: { onBack?: () => void }) {
                 if (!fromNode || !toNode) return null;
 
                 const highlighted = isConnectionHighlighted(conn.from as NodeType, conn.to as NodeType);
-                const x1 = fromNode.position.x + 75;
-                const y1 = fromNode.position.y + 40;
-                const x2 = toNode.position.x + 5;
-                const y2 = toNode.position.y + 40;
+                
+                // Node dimensions
+                const nodeWidth = 48;
+                const nodeHeight = 48;
+                
+                // Calculate start and end points at the edges of nodes
+                const fromCenterX = fromNode.position.x + nodeWidth / 2;
+                const fromCenterY = fromNode.position.y + nodeHeight / 2;
+                const toCenterX = toNode.position.x + nodeWidth / 2;
+                const toCenterY = toNode.position.y + nodeHeight / 2;
+                
+                let x1, y1, x2, y2;
+                
+                // Special handling for vertical connection from foreign to mills
+                if (conn.from === 'foreign' && conn.to === 'mills') {
+                  // Vertical connection - from bottom of foreign to top of mills
+                  x1 = fromCenterX;
+                  y1 = fromNode.position.y + nodeHeight;
+                  x2 = toCenterX;
+                  y2 = toNode.position.y;
+                } else {
+                  // Standard horizontal connections - from right edge to left edge
+                  x1 = fromNode.position.x + nodeWidth;
+                  y1 = fromCenterY;
+                  x2 = toNode.position.x;
+                  y2 = toCenterY;
+                }
+                
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                
+                let pathData: string;
+                
+                // Special handling for vertical connection from foreign to mills
+                if (conn.from === 'foreign' && conn.to === 'mills') {
+                  pathData = `M ${x1} ${y1} L ${x2} ${y2}`;
+                }
+                // Special handling for vertical branching from logistics node
+                else if (conn.from === 'logistics' && (conn.to === 'elevator-sea' || conn.to === 'elevator-field')) {
+                  const radius = 25;
+                  if (dy > 0) {
+                    // Downward curve
+                    pathData = `M ${x1} ${y1} L ${x1 + dx * 0.3} ${y1} Q ${x1 + dx * 0.3 + radius} ${y1}, ${x1 + dx * 0.3 + radius} ${y1 + radius} L ${x1 + dx * 0.3 + radius} ${y2 - radius} Q ${x1 + dx * 0.3 + radius} ${y2}, ${x1 + dx * 0.3 + radius * 2} ${y2} L ${x2} ${y2}`;
+                  } else {
+                    // Upward curve
+                    pathData = `M ${x1} ${y1} L ${x1 + dx * 0.3} ${y1} Q ${x1 + dx * 0.3 + radius} ${y1}, ${x1 + dx * 0.3 + radius} ${y1 - radius} L ${x1 + dx * 0.3 + radius} ${y2 + radius} Q ${x1 + dx * 0.3 + radius} ${y2}, ${x1 + dx * 0.3 + radius * 2} ${y2} L ${x2} ${y2}`;
+                  }
+                }
+                // Special handling for long horizontal arrow from elevator-field to mills
+                else if (conn.from === 'elevator-field' && conn.to === 'mills') {
+                  const midX = (x1 + x2) / 2;
+                  const midY = y1 - 30;
+                  pathData = `M ${x1} ${y1} Q ${midX} ${midY}, ${x2} ${y2}`;
+                }
+                // Default smooth curve for other connections
+                else {
+                  const cx1 = x1 + dx * 0.5;
+                  const cy1 = y1;
+                  const cx2 = x1 + dx * 0.5;
+                  const cy2 = y2;
+                  pathData = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
+                }
 
                 return (
-                  <motion.line
-                    key={idx}
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
-                    className={highlighted ? 'stroke-teal-600' : conn.color}
-                    strokeWidth={highlighted ? '4' : '2'}
-                    markerEnd={highlighted ? 'url(#arrowhead-grain-active)' : 'url(#arrowhead-grain)'}
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: highlighted ? 1 : 0.4 }}
-                    transition={{ duration: 0.5, delay: idx * 0.05 }}
-                  />
+                  <g key={idx}>
+                    <motion.path
+                      d={pathData}
+                      stroke={highlighted ? '#0d9488' : '#14b8a6'}
+                      strokeWidth={highlighted ? 3 : 2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                      markerEnd={highlighted ? 'url(#arrowhead-grain-active)' : 'url(#arrowhead-grain)'}
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{ 
+                        pathLength: 1, 
+                        opacity: highlighted ? 0.9 : (selectedPath ? 0.2 : 0.5)
+                      }}
+                      transition={{ duration: 0.5, delay: idx * 0.05 }}
+                    />
+                    {/* Waypoint dot for long horizontal arrow */}
+                    {conn.from === 'elevator-field' && conn.to === 'mills' && (
+                      <motion.circle
+                        cx={(x1 + x2) / 2}
+                        cy={y1 - 30}
+                        r={highlighted ? 4 : 3}
+                        fill={highlighted ? '#0d9488' : '#14b8a6'}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ 
+                          scale: 1, 
+                          opacity: highlighted ? 0.9 : (selectedPath ? 0.2 : 0.6)
+                        }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 + 0.3 }}
+                      />
+                    )}
+                  </g>
                 );
               })}
             </svg>
@@ -537,11 +695,11 @@ export default function GrainCaseStudy({ onBack }: { onBack?: () => void }) {
                 >
                   <div className="flex flex-col items-center">
                     <motion.div
-                      className={`w-20 h-20 bg-gradient-to-br ${node.gradient} rounded-2xl flex items-center justify-center shadow-xl cursor-pointer relative group`}
-                      whileHover={{ scale: 1.1 }}
+                      className={`w-12 h-12 bg-gradient-to-br ${node.gradient} rounded-xl flex items-center justify-center shadow-xl cursor-pointer relative group`}
+                      whileHover={{ scale: 1.15 }}
                       onClick={() => setSelectedNode(selectedNode === node.id ? null : node.id)}
                       animate={{
-                        scale: highlighted || selectedNode === node.id ? 1.1 : 1,
+                        scale: highlighted || selectedNode === node.id ? 1.15 : 1,
                         opacity: selectedPath ? (highlighted ? 1 : 0.4) : 1,
                         boxShadow: highlighted || selectedNode === node.id
                           ? '0 20px 25px -5px rgba(45, 107, 106, 0.3), 0 10px 10px -5px rgba(45, 107, 106, 0.2)'
@@ -549,10 +707,10 @@ export default function GrainCaseStudy({ onBack }: { onBack?: () => void }) {
                       }}
                       transition={{ duration: 0.3 }}
                     >
-                      <Icon className="w-10 h-10 text-white drop-shadow-lg" />
+                      <Icon className="w-6 h-6 text-white drop-shadow-lg" />
                       {(highlighted || selectedNode === node.id) && (
                         <motion.div
-                          className="absolute -inset-1 bg-gradient-to-r from-teal-400 to-teal-500 rounded-2xl opacity-30 blur-sm"
+                          className="absolute -inset-1 bg-gradient-to-r from-teal-400 to-teal-500 rounded-xl opacity-30 blur-sm"
                           initial={{ scale: 0 }}
                           animate={{ scale: 1.3 }}
                           transition={{ duration: 0.3 }}
@@ -764,27 +922,99 @@ export default function GrainCaseStudy({ onBack }: { onBack?: () => void }) {
         <div className="grid grid-cols-3 gap-6 mt-6 relative z-0">
           <Card className="p-6 bg-gradient-to-br from-blue-50/50 to-white border-2 border-blue-100 relative z-10">
             <h3 className="text-sm mb-4 text-blue-900">Moisture Level Trend</h3>
-            <ResponsiveContainer width="100%" height={120}>
-              <LineChart data={moistureTrendData}>
-                <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} dot={false} />
+            <ResponsiveContainer width="100%" height={160}>
+              <LineChart data={moistureTrendData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 10, fill: '#6b7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#d1d5db' }}
+                />
+                <YAxis 
+                  domain={[10, 14]} 
+                  tick={{ fontSize: 10, fill: '#6b7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#d1d5db' }}
+                  label={{ value: '%', position: 'insideLeft', style: { fontSize: 10, fill: '#6b7280' } }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1f2937', 
+                    border: 'none', 
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    color: '#fff'
+                  }}
+                  formatter={(value: any) => [`${value.toFixed(1)}%`, 'Moisture']}
+                />
+                <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </Card>
 
           <Card className="p-6 bg-gradient-to-br from-orange-50/50 to-white border-2 border-orange-100 relative z-10">
             <h3 className="text-sm mb-4 text-orange-900">Storage Temperature Trend</h3>
-            <ResponsiveContainer width="100%" height={120}>
-              <LineChart data={storageTempTrendData}>
-                <Line type="monotone" dataKey="value" stroke="#f97316" strokeWidth={3} dot={false} />
+            <ResponsiveContainer width="100%" height={160}>
+              <LineChart data={storageTempTrendData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 10, fill: '#6b7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#d1d5db' }}
+                />
+                <YAxis 
+                  domain={[15, 25]} 
+                  tick={{ fontSize: 10, fill: '#6b7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#d1d5db' }}
+                  label={{ value: '°C', position: 'insideLeft', style: { fontSize: 10, fill: '#6b7280' } }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1f2937', 
+                    border: 'none', 
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    color: '#fff'
+                  }}
+                  formatter={(value: any) => [`${value.toFixed(1)}°C`, 'Temperature']}
+                />
+                <Line type="monotone" dataKey="value" stroke="#f97316" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </Card>
 
           <Card className="p-6 bg-gradient-to-br from-red-50/50 to-white border-2 border-red-100 relative z-10">
             <h3 className="text-sm mb-4 text-red-900">Disruption Impact Trend</h3>
-            <ResponsiveContainer width="100%" height={120}>
-              <LineChart data={disruptionTrendData}>
-                <Line type="monotone" dataKey="value" stroke="#ef4444" strokeWidth={3} dot={false} />
+            <ResponsiveContainer width="100%" height={160}>
+              <LineChart data={disruptionTrendData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 10, fill: '#6b7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#d1d5db' }}
+                />
+                <YAxis 
+                  domain={[60, 90]} 
+                  tick={{ fontSize: 10, fill: '#6b7280' }}
+                  tickLine={false}
+                  axisLine={{ stroke: '#d1d5db' }}
+                  label={{ value: 'Index', position: 'insideLeft', style: { fontSize: 10, fill: '#6b7280' } }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1f2937', 
+                    border: 'none', 
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    color: '#fff'
+                  }}
+                  formatter={(value: any) => [`${value.toFixed(0)}`, 'Disruption']}
+                />
+                <Line type="monotone" dataKey="value" stroke="#ef4444" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </Card>

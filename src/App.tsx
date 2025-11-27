@@ -28,12 +28,34 @@ export default function App() {
 
   const menuItems = ['Dashboard', 'Monitoring', 'Simulations', 'Reports'];
 
+  // Map use case IDs to sector names
+  const useCaseToSector = (useCaseId: number): 'grain' | 'fruits' | 'fish' => {
+    switch (useCaseId) {
+      case 1:
+        return 'grain';
+      case 2:
+        return 'fruits';
+      case 3:
+        return 'fish';
+      default:
+        return 'grain';
+    }
+  };
+
   const handleUseCaseClick = (useCaseId: number) => {
     setSelectedUseCase(useCaseId);
+    setActiveMenu('Dashboard'); // Reset to Dashboard when selecting a use case
   };
 
   const handleBackToUseCases = () => {
     setSelectedUseCase(null);
+    setActiveMenu('Dashboard');
+  };
+
+  const handleLogoClick = () => {
+    setSelectedUseCase(null);
+    setCurrentScreen(0);
+    setActiveMenu('Dashboard');
   };
 
   const screens = [
@@ -70,40 +92,55 @@ export default function App() {
         {/* Top bar with logo and menu */}
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-[1800px] mx-auto px-8 py-4 flex items-center justify-between">
-            <img src={logo} alt="SecureFood" className="h-12" />
+            <img
+              src={logo}
+              alt="SecureFood"
+              className="h-12 cursor-pointer"
+              onClick={handleLogoClick}
+            />
             
-            {/* Menu */}
-            <nav className="flex gap-8">
-              {menuItems.map((item) => (
-                <button
-                  key={item}
-                  onClick={() => setActiveMenu(item)}
-                  className={`text-sm transition-colors hover:text-teal-600 text-gray-700 ${
-                    activeMenu === item ? 'border-b-2 border-teal-600 pb-1 text-teal-700' : ''
-                  }`}
-                >
-                  {item}
-                </button>
-              ))}
-            </nav>
+            {/* Menu - only show after use case is selected */}
+            {selectedUseCase !== null && (
+              <nav className="flex gap-8">
+                {menuItems.map((item) => (
+                  <button
+                    key={item}
+                    onClick={() => setActiveMenu(item)}
+                    className={`text-sm transition-colors hover:text-teal-600 text-gray-700 ${
+                      activeMenu === item ? 'border-b-2 border-teal-600 pb-1 text-teal-700' : ''
+                    }`}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </nav>
+            )}
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1">{selectedUseCase === 1 ? (
-          <GrainCaseStudy onBack={handleBackToUseCases} />
-        ) : selectedUseCase === 2 ? (
-          <FruitVegetablesCaseStudy onBack={handleBackToUseCases} />
-        ) : selectedUseCase === 3 ? (
-          <FishCaseStudy onBack={handleBackToUseCases} />
-        ) : activeMenu === 'Simulations' ? (
-          <SimulationsPage />
-        ) : activeMenu === 'Reports' ? (
-          <ReportsPage />
-        ) : activeMenu === 'Monitoring' ? (
-          <MonitoringPage />
+      <div className="flex-1">
+        {selectedUseCase !== null ? (
+          // Show content based on menu selection for the selected use case
+          activeMenu === 'Dashboard' ? (
+            // Dashboard shows the case study landing page
+            selectedUseCase === 1 ? (
+              <GrainCaseStudy onBack={handleBackToUseCases} />
+            ) : selectedUseCase === 2 ? (
+              <FruitVegetablesCaseStudy onBack={handleBackToUseCases} />
+            ) : selectedUseCase === 3 ? (
+              <FishCaseStudy onBack={handleBackToUseCases} />
+            ) : null
+          ) : activeMenu === 'Monitoring' ? (
+            <MonitoringPage initialSector={useCaseToSector(selectedUseCase)} />
+          ) : activeMenu === 'Simulations' ? (
+            <SimulationsPage initialSector={useCaseToSector(selectedUseCase)} />
+          ) : activeMenu === 'Reports' ? (
+            <ReportsPage initialSector={useCaseToSector(selectedUseCase)} />
+          ) : null
         ) : (
+          // No use case selected - show Screen0
           screens[currentScreen]
         )}
       </div>

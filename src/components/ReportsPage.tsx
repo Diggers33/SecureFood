@@ -6,9 +6,13 @@ import { Label } from './ui/label';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Download, Trash2, FileSpreadsheet, File, FileText, Folder, Clock, CheckCircle, Fish, Wheat, Apple, Milk, Activity } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 type ReportSector = 'fish' | 'aquaculture' | 'grain' | 'fruits' | 'dairy';
+
+interface ReportsPageProps {
+  initialSector?: ReportSector;
+}
 
 interface FileItem {
   id: string;
@@ -63,10 +67,10 @@ const initialFiles: FileItem[] = [
   },
 ];
 
-export default function ReportsPage() {
+export default function ReportsPage({ initialSector = 'fish' }: ReportsPageProps) {
   const [files, setFiles] = useState<FileItem[]>(initialFiles);
   const [activeTab, setActiveTab] = useState('files');
-  const [selectedSector, setSelectedSector] = useState<ReportSector>('fish');
+  const [selectedSector, setSelectedSector] = useState<ReportSector>(initialSector);
 
   const sectors = [
     { id: 'fish' as ReportSector, name: 'Fish - Greece', icon: Fish, color: 'blue', gradient: 'from-blue-500 to-cyan-600' },
@@ -75,6 +79,9 @@ export default function ReportsPage() {
     { id: 'fruits' as ReportSector, name: 'Fruits & Vegetables - Portugal', icon: Apple, color: 'green', gradient: 'from-green-500 to-emerald-600' },
     { id: 'dairy' as ReportSector, name: 'Milk & Dairy - Greece/Finland', icon: Milk, color: 'indigo', gradient: 'from-indigo-500 to-purple-600' },
   ];
+
+  const currentSector = sectors.find(s => s.id === selectedSector);
+  const CurrentSectorIcon = currentSector?.icon || Activity;
 
   const handleDownload = (fileId: string) => {
     const file = files.find((f) => f.id === fileId);
@@ -121,39 +128,20 @@ export default function ReportsPage() {
       <div className="max-w-[1800px] mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white shadow-sm rounded-full mb-4 border-2 border-teal-200">
-            <Folder className="w-4 h-4 text-teal-600" />
-            <span className="text-sm text-teal-700">Document Management</span>
+          {/* Current Sector Indicator */}
+          <div className="flex items-center gap-4 mb-4">
+            <div 
+              className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br ${currentSector?.gradient}`}
+            >
+              <CurrentSectorIcon className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl mb-1">
+                {currentSector?.name.split(' - ')[0]} <span className="text-teal-600">Reports</span>
+              </h1>
+              <p className="text-sm text-gray-600">{currentSector?.name}</p>
+            </div>
           </div>
-          <h1 className="text-4xl mb-2">
-            Reports & <span className="text-teal-600">Files</span>
-          </h1>
-          <p className="text-sm text-gray-600">Manage your supply chain reports and data files</p>
-        </div>
-
-        {/* Sector Selection */}
-        <div className="mb-6 flex gap-3 flex-wrap">
-          {sectors.map((sector) => {
-            const Icon = sector.icon;
-            const isActive = selectedSector === sector.id;
-            return (
-              <motion.div key={sector.id} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant={isActive ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedSector(sector.id)}
-                  className={`h-11 text-sm transition-all duration-300 ${
-                    isActive
-                      ? `bg-gradient-to-r ${sector.gradient} hover:opacity-90 text-white shadow-lg scale-105 border-0`
-                      : `hover:border-${sector.color}-300 hover:bg-${sector.color}-50 border-2`
-                  }`}
-                >
-                  <Icon className="w-4 h-4 mr-2" />
-                  {sector.name}
-                </Button>
-              </motion.div>
-            );
-          })}
         </div>
 
         {/* Stats Cards */}

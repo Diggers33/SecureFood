@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Wheat, Apple, Fish, Droplet, Milk, Check, ArrowRight, TrendingUp, Sparkles } from 'lucide-react';
 import { Card } from './ui/card';
 
@@ -60,8 +59,6 @@ const useCases = [
 ];
 
 export default function Screen0({ onUseCaseClick }: Screen0Props) {
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-[1600px] mx-auto">
@@ -85,18 +82,17 @@ export default function Screen0({ onUseCaseClick }: Screen0Props) {
           {useCases.map((useCase) => {
             const IconComponent = useCase.icon;
             return (
-              <Card
+              <Card 
                 key={useCase.id}
                 className={`p-0 transition-all duration-300 flex flex-col group relative overflow-hidden ${
-                  useCase.active
-                    ? 'hover:shadow-lg border-2 border-gray-200 hover:-translate-y-1'
+                  useCase.active 
+                    ? 'hover:shadow-lg cursor-pointer border-2 border-gray-200 hover:-translate-y-1'
                     : 'opacity-70 cursor-not-allowed border-2 border-gray-200'
                 }`}
-                style={useCase.active ? {
+                style={useCase.active ? { 
                   '--hover-border-color': '#2d6b6a'
                 } as React.CSSProperties : {}}
-                onMouseEnter={() => useCase.active && setHoveredCard(useCase.id)}
-                onMouseLeave={() => setHoveredCard(null)}
+                onClick={() => useCase.active && onUseCaseClick?.(useCase.id)}
               >
                 {/* Header */}
                 <div className="bg-gray-50 p-6 pb-4 relative">
@@ -147,23 +143,13 @@ export default function Screen0({ onUseCaseClick }: Screen0Props) {
                     <span>{useCase.partner}</span>
                   </div>
 
-                  {/* Explore Button */}
+                  {/* Hover Hint */}
                   {useCase.active && (
-                    <div className="text-center">
-                      <button
-                        onClick={() => onUseCaseClick?.(useCase.id)}
-                        className="text-xs inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-white shadow-md"
-                        style={{
-                          backgroundColor: '#f59e0b',
-                          opacity: hoveredCard === useCase.id ? 1 : 0,
-                          transform: hoveredCard === useCase.id ? 'translateY(0)' : 'translateY(10px)',
-                          transition: 'all 0.3s ease',
-                          pointerEvents: hoveredCard === useCase.id ? 'auto' : 'none'
-                        }}
-                      >
+                    <div className="mt-4 text-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                      <span className="text-xs inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-warning text-white shadow-md">
                         Click to explore
                         <ArrowRight className="w-3 h-3" />
-                      </button>
+                      </span>
                     </div>
                   )}
                 </div>

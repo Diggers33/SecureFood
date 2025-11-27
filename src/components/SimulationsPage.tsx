@@ -7,7 +7,7 @@ import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Upload, FileSpreadsheet, ChevronDown, Sparkles, TrendingUp, Activity, BarChart3, Zap, Target, Brain, Fish, Wheat, Apple, Milk, PlayCircle, Trash2, Copy, X } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Legend } from 'recharts';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { SavedSimulationsPanel, ComparisonView } from './SimulationComparisonPanel';
 
 type SimulationSector = 'fish' | 'aquaculture' | 'grain' | 'fruits' | 'dairy';
@@ -133,9 +133,13 @@ const simulationData = [
   { time: 'Jun', demand: 130, supply: 135, inventory: 95 },
 ];
 
-export default function SimulationsPage() {
+interface SimulationsPageProps {
+  initialSector?: SimulationSector;
+}
+
+export default function SimulationsPage({ initialSector = 'fish' }: SimulationsPageProps) {
   const [activeTab, setActiveTab] = useState('simulations');
-  const [selectedSector, setSelectedSector] = useState<SimulationSector>('fish');
+  const [selectedSector, setSelectedSector] = useState<SimulationSector>(initialSector);
   const [selectedVariable, setSelectedVariable] = useState('Capture volume');
   const [selectedMonth, setSelectedMonth] = useState('January');
   const [selectedYear, setSelectedYear] = useState('2024');
@@ -155,6 +159,9 @@ export default function SimulationsPage() {
     { id: 'fruits' as SimulationSector, name: 'Fruits & Vegetables - Portugal', icon: Apple, color: 'green', gradient: 'from-green-500 to-emerald-600' },
     { id: 'dairy' as SimulationSector, name: 'Milk & Dairy - Greece/Finland', icon: Milk, color: 'indigo', gradient: 'from-indigo-500 to-purple-600' },
   ];
+
+  const currentSector = sectors.find(s => s.id === selectedSector);
+  const CurrentSectorIcon = currentSector?.icon || Activity;
 
   const variables = [
     'Capture volume',
@@ -432,14 +439,20 @@ export default function SimulationsPage() {
       <div className="flex-1 p-6">
         {/* Header */}
         <div className="mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white shadow-sm rounded-full mb-4 border border-gray-200">
-            <Activity className="w-4 h-4" style={{ color: '#2d6b6a' }} />
-            <span className="text-sm" style={{ color: '#2d6b6a' }}>Advanced Analytics</span>
+          {/* Current Sector Indicator */}
+          <div className="flex items-center gap-4 mb-4">
+            <div 
+              className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br ${currentSector?.gradient}`}
+            >
+              <CurrentSectorIcon className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl mb-1">
+                {currentSector?.name.split(' - ')[0]} <span style={{ color: '#2d6b6a' }}>Simulations</span>
+              </h1>
+              <p className="text-sm text-gray-600">{currentSector?.name}</p>
+            </div>
           </div>
-          <h1 className="text-4xl mb-2">
-            Simulations & <span style={{ color: '#2d6b6a' }}>Forecasting</span>
-          </h1>
-          <p className="text-sm text-gray-600">AI-powered predictive modeling and scenario analysis</p>
         </div>
 
         {/* Tabs */}
@@ -813,132 +826,321 @@ export default function SimulationsPage() {
               animate={{ opacity: 1, y: 0 }}
               className="space-y-5"
             >
+              {/* Main Forecasting Charts */}
               <div className="grid grid-cols-2 gap-6">
-                {/* Left: Scatter Plot */}
+                {/* Left: Fish Production Forecast */}
                 <Card className="p-6 bg-white border-2 border-teal-100 hover:border-teal-300 hover:shadow-xl transition-all">
                   <div className="flex items-center gap-3 mb-5">
                     <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
-                      <Activity className="w-5 h-5 text-white" />
+                      <TrendingUp className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-sm text-gray-800">Relationship: Volume vs Quality</h3>
-                      <p className="text-xs text-gray-500">Correlation analysis</p>
+                      <h3 className="text-sm text-gray-800">Fish Production Volume Forecast</h3>
+                      <p className="text-xs text-gray-500">12-month prediction based on historical data</p>
                     </div>
                   </div>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <ScatterChart margin={{ top: 10, right: 10, bottom: 40, left: 40 }}>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <LineChart data={[
+                      { month: 'Jan', historical: 850, forecast: null },
+                      { month: 'Feb', historical: 920, forecast: null },
+                      { month: 'Mar', historical: 980, forecast: null },
+                      { month: 'Apr', historical: 1050, forecast: null },
+                      { month: 'May', historical: 1120, forecast: null },
+                      { month: 'Jun', historical: 1180, forecast: null },
+                      { month: 'Jul', historical: null, forecast: 1240 },
+                      { month: 'Aug', historical: null, forecast: 1310 },
+                      { month: 'Sep', historical: null, forecast: 1380 },
+                      { month: 'Oct', historical: null, forecast: 1420 },
+                      { month: 'Nov', historical: null, forecast: 1480 },
+                      { month: 'Dec', historical: null, forecast: 1520 },
+                    ]} margin={{ top: 10, right: 10, bottom: 20, left: 40 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
                       <XAxis 
-                        type="number" 
-                        dataKey="volume" 
-                        name="Volume" 
-                        tick={{ fontSize: 10 }}
-                        label={{ value: 'Volume', position: 'insideBottom', offset: -10, style: { fontSize: 11 } }}
-                        domain={[0, 100]}
+                        dataKey="month" 
+                        tick={{ fontSize: 11 }}
                         stroke="#64748b"
                       />
                       <YAxis 
-                        type="number" 
-                        dataKey="quality" 
-                        name="Quality" 
-                        tick={{ fontSize: 10 }}
-                        label={{ value: 'Quality', angle: -90, position: 'insideLeft', style: { fontSize: 11 } }}
-                        domain={[0, 100]}
+                        tick={{ fontSize: 11 }}
+                        label={{ value: 'Production (tons)', angle: -90, position: 'insideLeft', style: { fontSize: 11 } }}
                         stroke="#64748b"
                       />
                       <Tooltip 
-                        cursor={{ strokeDasharray: '3 3' }} 
                         contentStyle={{ 
                           borderRadius: '12px', 
                           border: '2px solid #e2e8f0',
                           fontSize: '11px'
                         }} 
                       />
-                      <Scatter data={scatterData} fill="#14b8a6" />
-                    </ScatterChart>
+                      <Line 
+                        type="monotone" 
+                        dataKey="historical" 
+                        stroke="#14b8a6" 
+                        strokeWidth={3}
+                        dot={{ fill: '#14b8a6', r: 4 }}
+                        name="Historical Data"
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="forecast" 
+                        stroke="#f59e0b" 
+                        strokeWidth={3}
+                        strokeDasharray="5 5"
+                        dot={{ fill: '#f59e0b', r: 4 }}
+                        name="Forecasted"
+                      />
+                    </LineChart>
                   </ResponsiveContainer>
                   <div className="mt-4 p-3 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl border border-teal-200">
                     <div className="grid grid-cols-2 gap-3 text-xs">
                       <div>
-                        <p className="text-gray-600">Correlation coefficient:</p>
-                        <p className="text-base text-teal-700">0.72</p>
+                        <p className="text-gray-600">Forecast Model:</p>
+                        <p className="text-sm text-teal-700">ARIMA (2,1,2)</p>
                       </div>
                       <div>
-                        <p className="text-gray-600">p-value:</p>
-                        <p className="text-base text-teal-700">&lt; 0.001</p>
+                        <p className="text-gray-600">Prediction Accuracy:</p>
+                        <p className="text-sm text-teal-700">94.3%</p>
                       </div>
                     </div>
                   </div>
                 </Card>
 
-                {/* Right: Correlation Matrix */}
-                <Card className="p-6 bg-white border-2 border-gray-200 hover:shadow-xl transition-all">
+                {/* Right: Water Temperature Forecast */}
+                <Card className="p-6 bg-white border-2 border-blue-100 hover:border-blue-300 hover:shadow-xl transition-all">
                   <div className="flex items-center gap-3 mb-5">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md" style={{ backgroundColor: '#2d6b6a' }}>
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
+                      <TrendingUp className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm text-gray-800">Water Temperature Forecast</h3>
+                      <p className="text-xs text-gray-500">8-week prediction with confidence intervals</p>
+                    </div>
+                  </div>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <LineChart data={[
+                      { week: 'W1', actual: 15.2, predicted: null, upper: null, lower: null },
+                      { week: 'W2', actual: 15.8, predicted: null, upper: null, lower: null },
+                      { week: 'W3', actual: 16.1, predicted: null, upper: null, lower: null },
+                      { week: 'W4', actual: 16.5, predicted: null, upper: null, lower: null },
+                      { week: 'W5', actual: null, predicted: 17.0, upper: 17.8, lower: 16.2 },
+                      { week: 'W6', actual: null, predicted: 17.5, upper: 18.5, lower: 16.5 },
+                      { week: 'W7', actual: null, predicted: 18.0, upper: 19.2, lower: 16.8 },
+                      { week: 'W8', actual: null, predicted: 18.3, upper: 19.8, lower: 16.8 },
+                    ]} margin={{ top: 10, right: 10, bottom: 20, left: 40 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
+                      <XAxis 
+                        dataKey="week" 
+                        tick={{ fontSize: 11 }}
+                        stroke="#64748b"
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 11 }}
+                        label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft', style: { fontSize: 11 } }}
+                        domain={[14, 21]}
+                        stroke="#64748b"
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          borderRadius: '12px', 
+                          border: '2px solid #e2e8f0',
+                          fontSize: '11px'
+                        }} 
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="upper" 
+                        stroke="#93c5fd" 
+                        strokeWidth={1}
+                        dot={false}
+                        name="Upper Bound (95% CI)"
+                        strokeDasharray="3 3"
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="lower" 
+                        stroke="#93c5fd" 
+                        strokeWidth={1}
+                        dot={false}
+                        name="Lower Bound (95% CI)"
+                        strokeDasharray="3 3"
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="actual" 
+                        stroke="#3b82f6" 
+                        strokeWidth={3}
+                        dot={{ fill: '#3b82f6', r: 4 }}
+                        name="Actual Data"
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="predicted" 
+                        stroke="#f59e0b" 
+                        strokeWidth={3}
+                        strokeDasharray="5 5"
+                        dot={{ fill: '#f59e0b', r: 4 }}
+                        name="Forecasted"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                  <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <p className="text-gray-600">Forecast Model:</p>
+                        <p className="text-sm text-blue-700">Prophet ML</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">Confidence Level:</p>
+                        <p className="text-sm text-blue-700">95%</p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Additional Forecasting Charts */}
+              <div className="grid grid-cols-2 gap-6">
+                {/* Left: Market Demand Forecast */}
+                <Card className="p-6 bg-white border-2 border-orange-100 hover:border-orange-300 hover:shadow-xl transition-all">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md">
                       <BarChart3 className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-sm text-gray-800">Correlation Matrix</h3>
-                      <p className="text-xs text-gray-500">Cross-variable relationships</p>
+                      <h3 className="text-sm text-gray-800">Market Demand Forecast</h3>
+                      <p className="text-xs text-gray-500">Quarterly demand prediction for 2025</p>
                     </div>
                   </div>
-                  <div className="overflow-auto">
-                    <div className="inline-block min-w-full">
-                      {/* Column Headers */}
-                      <div className="flex mb-2">
-                        <div className="w-20"></div>
-                        {['Revenue', 'Volume', 'Distance', 'Quality', 'Lead Time'].map((col) => (
-                          <div key={col} className="w-16 text-center text-[10px] text-gray-700 px-1">
-                            {col}
-                          </div>
-                        ))}
+                  <ResponsiveContainer width="100%" height={280}>
+                    <LineChart data={[
+                      { quarter: '2024 Q3', actual: 3200, forecast: null },
+                      { quarter: '2024 Q4', actual: 3450, forecast: null },
+                      { quarter: '2025 Q1', actual: 3600, forecast: null },
+                      { quarter: '2025 Q2', actual: null, forecast: 3850 },
+                      { quarter: '2025 Q3', actual: null, forecast: 4100 },
+                      { quarter: '2025 Q4', actual: null, forecast: 4320 },
+                    ]} margin={{ top: 10, right: 10, bottom: 20, left: 50 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
+                      <XAxis 
+                        dataKey="quarter" 
+                        tick={{ fontSize: 10 }}
+                        stroke="#64748b"
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 11 }}
+                        label={{ value: 'Demand (tons)', angle: -90, position: 'insideLeft', style: { fontSize: 11 } }}
+                        stroke="#64748b"
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          borderRadius: '12px', 
+                          border: '2px solid #e2e8f0',
+                          fontSize: '11px'
+                        }} 
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="actual" 
+                        stroke="#f97316" 
+                        strokeWidth={3}
+                        dot={{ fill: '#f97316', r: 5 }}
+                        name="Historical Demand"
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="forecast" 
+                        stroke="#f59e0b" 
+                        strokeWidth={3}
+                        strokeDasharray="5 5"
+                        dot={{ fill: '#f59e0b', r: 5 }}
+                        name="Forecasted Demand"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                  <div className="mt-4 p-3 bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl border border-orange-200">
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <p className="text-gray-600">Growth Rate:</p>
+                        <p className="text-sm text-orange-700">+8.2% annually</p>
                       </div>
-                      {/* Matrix Rows */}
-                      {['Revenue', 'Volume', 'Distance', 'Quality', 'Lead Time'].map((row) => (
-                        <div key={row} className="flex mb-2">
-                          <div className="w-20 text-[10px] text-gray-700 flex items-center pr-2 justify-end">
-                            {row}
-                          </div>
-                          {['Revenue', 'Volume', 'Distance', 'Quality', 'Lead Time'].map((col) => {
-                            const cell = correlationData.find(c => c.row === row && c.col === col);
-                            return (
-                              <motion.div 
-                                key={`${row}-${col}`}
-                                whileHover={{ scale: 1.1, zIndex: 10 }}
-                                className="w-16 h-12 flex items-center justify-center text-[10px] mx-0.5 rounded-lg shadow-sm transition-all cursor-pointer"
-                                style={{ 
-                                  backgroundColor: getCorrelationColor(cell?.value || 0),
-                                  color: Math.abs(cell?.value || 0) >= 0.6 ? 'white' : '#374151'
-                                }}
-                              >
-                                {cell?.label}
-                              </motion.div>
-                            );
-                          })}
-                        </div>
-                      ))}
-                      {/* Legend */}
-                      <div className="mt-4 flex items-center gap-3 text-[10px] flex-wrap">
-                        <div className="flex items-center gap-1">
-                          <div className="w-4 h-4 bg-[#047857] rounded"></div>
-                          <span>Strong +</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="w-4 h-4 bg-[#99f6e4] rounded"></div>
-                          <span>Weak +</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="w-4 h-4 bg-[#f3f4f6] rounded"></div>
-                          <span>None</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="w-4 h-4 bg-[#fecdd3] rounded"></div>
-                          <span>Weak -</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="w-4 h-4 bg-[#f87171] rounded"></div>
-                          <span>Strong -</span>
-                        </div>
+                      <div>
+                        <p className="text-gray-600">Model RMSE:</p>
+                        <p className="text-sm text-orange-700">142 tons</p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Right: Price Forecast */}
+                <Card className="p-6 bg-white border-2 border-purple-100 hover:border-purple-300 hover:shadow-xl transition-all">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+                      <Activity className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm text-gray-800">Fish Price Forecast (€/kg)</h3>
+                      <p className="text-xs text-gray-500">6-month price projection with seasonality</p>
+                    </div>
+                  </div>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <LineChart data={[
+                      { month: 'Jan', price: 12.5, forecast: null },
+                      { month: 'Feb', price: 13.2, forecast: null },
+                      { month: 'Mar', price: 14.1, forecast: null },
+                      { month: 'Apr', price: null, forecast: 14.8 },
+                      { month: 'May', price: null, forecast: 15.3 },
+                      { month: 'Jun', price: null, forecast: 15.1 },
+                      { month: 'Jul', price: null, forecast: 14.5 },
+                      { month: 'Aug', price: null, forecast: 13.8 },
+                      { month: 'Sep', price: null, forecast: 13.2 },
+                    ]} margin={{ top: 10, right: 10, bottom: 20, left: 40 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
+                      <XAxis 
+                        dataKey="month" 
+                        tick={{ fontSize: 11 }}
+                        stroke="#64748b"
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 11 }}
+                        label={{ value: 'Price (€/kg)', angle: -90, position: 'insideLeft', style: { fontSize: 11 } }}
+                        domain={[12, 16]}
+                        stroke="#64748b"
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          borderRadius: '12px', 
+                          border: '2px solid #e2e8f0',
+                          fontSize: '11px'
+                        }} 
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="price" 
+                        stroke="#9333ea" 
+                        strokeWidth={3}
+                        dot={{ fill: '#9333ea', r: 4 }}
+                        name="Historical Price"
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="forecast" 
+                        stroke="#f59e0b" 
+                        strokeWidth={3}
+                        strokeDasharray="5 5"
+                        dot={{ fill: '#f59e0b', r: 4 }}
+                        name="Forecasted Price"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                  <div className="mt-4 p-3 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl border border-purple-200">
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <p className="text-gray-600">Seasonal Pattern:</p>
+                        <p className="text-sm text-purple-700">Peak in May</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">MAE:</p>
+                        <p className="text-sm text-purple-700">€0.32/kg</p>
                       </div>
                     </div>
                   </div>
@@ -951,18 +1153,17 @@ export default function SimulationsPage() {
 
       {/* Upload Form Modal */}
       {showUploadForm && (
-        <motion.div
+        <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50"
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", duration: 0.3 }}
           >
-            <Card className="p-8 max-w-md w-full mx-4 shadow-2xl border-2 border-purple-200" style={{ backgroundColor: '#FFFFFF' }}>
+            <Card className="p-8 max-w-md w-full mx-4 shadow-2xl border-2 border-purple-200">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                   <Upload className="w-6 h-6 text-white" />
@@ -1045,11 +1246,10 @@ export default function SimulationsPage() {
 
       {/* Save Simulation Dialog */}
       {showSaveDialog && (
-        <motion.div
+        <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setShowSaveDialog(false);
@@ -1063,7 +1263,7 @@ export default function SimulationsPage() {
             transition={{ type: "spring", duration: 0.3 }}
             className="w-full max-w-md"
           >
-            <Card className="p-8 shadow-2xl border-2 border-gray-200" style={{ backgroundColor: '#FFFFFF' }}>
+            <Card className="p-8 shadow-2xl border-2 border-gray-200">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg" style={{ backgroundColor: '#2d6b6a' }}>
                   <PlayCircle className="w-6 h-6 text-white" />
