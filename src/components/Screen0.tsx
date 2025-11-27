@@ -146,7 +146,10 @@ export default function Screen0({ onUseCaseClick }: Screen0Props) {
                   {/* Hover Hint */}
                   {useCase.active && (
                     <div className="mt-4 text-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
-                      <span className="text-xs inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-warning text-white shadow-md">
+                      <span
+                        className="text-xs inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-white shadow-md"
+                        style={{ backgroundColor: '#f59e0b' }}
+                      >
                         Click to explore
                         <ArrowRight className="w-3 h-3" />
                       </span>
