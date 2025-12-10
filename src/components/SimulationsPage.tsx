@@ -9,6 +9,8 @@ import { Upload, FileSpreadsheet, ChevronDown, Sparkles, TrendingUp, Activity, B
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, Legend } from 'recharts';
 import { motion } from 'motion/react';
 import { SavedSimulationsPanel, ComparisonView } from './SimulationComparisonPanel';
+import { BackToUseCasesButton } from './BackToUseCasesButton';
+import { ConfusionMatrixWidget } from './ConfusionMatrixWidget';
 
 type SimulationSector = 'fish' | 'aquaculture' | 'grain' | 'fruits' | 'dairy';
 
@@ -135,9 +137,10 @@ const simulationData = [
 
 interface SimulationsPageProps {
   initialSector?: SimulationSector;
+  onBackToUseCases?: () => void;
 }
 
-export default function SimulationsPage({ initialSector = 'fish' }: SimulationsPageProps) {
+export default function SimulationsPage({ initialSector = 'fish', onBackToUseCases }: SimulationsPageProps) {
   const [activeTab, setActiveTab] = useState('simulations');
   const [selectedSector, setSelectedSector] = useState<SimulationSector>(initialSector);
   const [selectedVariable, setSelectedVariable] = useState('Capture volume');
@@ -271,10 +274,6 @@ export default function SimulationsPage({ initialSector = 'fish' }: SimulationsP
       <div className="w-64 bg-white border-r border-gray-200 p-5 flex-shrink-0 shadow-sm">
         {/* Header */}
         <div className="mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full mb-3 border border-gray-200" style={{ backgroundColor: '#f0f9f9' }}>
-            <Sparkles className="w-4 h-4" style={{ color: '#2d6b6a' }} />
-            <span className="text-sm" style={{ color: '#2d6b6a' }}>AI-Powered</span>
-          </div>
           <h2 className="text-lg mb-1">Simulation Controls</h2>
           <p className="text-xs text-gray-500">Configure your analysis parameters</p>
         </div>
@@ -439,6 +438,13 @@ export default function SimulationsPage({ initialSector = 'fish' }: SimulationsP
       <div className="flex-1 p-6">
         {/* Header */}
         <div className="mb-6">
+          {/* Back Button */}
+          {onBackToUseCases && (
+            <div className="mb-4">
+              <BackToUseCasesButton onClick={onBackToUseCases} />
+            </div>
+          )}
+          
           {/* Current Sector Indicator */}
           <div className="flex items-center gap-4 mb-4">
             <div 
@@ -556,44 +562,21 @@ export default function SimulationsPage({ initialSector = 'fish' }: SimulationsP
                   style={{ backgroundColor: '#f59e0b' }}
                 >
                   <PlayCircle className="w-5 h-5 mr-2" />
-                  Run New Simulation
+                  Save and compare simulation
                 </Button>
-                
-                {savedSimulations.length > 0 && (
-                  <Button
-                    variant={showComparison ? 'default' : 'outline'}
-                    onClick={() => setShowComparison(!showComparison)}
-                    className="h-12 px-6 rounded-xl"
-                    style={showComparison ? { backgroundColor: '#64748b', color: 'white' } : {}}
-                  >
-                    <BarChart3 className="w-5 h-5 mr-2" />
-                    {showComparison ? 'Hide' : 'Show'} Comparison
-                  </Button>
-                )}
-
-                {showComparison && selectedSimulations.length > 0 && (
-                  <Badge 
-                    className="h-12 px-4 flex items-center gap-2 text-white rounded-xl"
-                    style={{ backgroundColor: '#2d6b6a' }}
-                  >
-                    <Target className="w-4 h-4" />
-                    {selectedSimulations.length} scenarios selected
-                  </Badge>
-                )}
               </div>
 
               {/* Saved Simulations Panel */}
               <SavedSimulationsPanel
                 savedSimulations={savedSimulations}
                 selectedSimulations={selectedSimulations}
-                showComparison={showComparison}
                 onDelete={handleDeleteSimulation}
                 onDuplicate={handleDuplicateSimulation}
                 onToggleSelection={toggleSimulationSelection}
               />
 
               {/* Comparison View */}
-              {showComparison && (
+              {selectedSimulations.length > 0 && (
                 <ComparisonView
                   savedSimulations={savedSimulations}
                   selectedSimulations={selectedSimulations}
@@ -771,49 +754,7 @@ export default function SimulationsPage({ initialSector = 'fish' }: SimulationsP
                   </div>
 
                   {/* Bottom Right: Confusion Matrix */}
-                  <div className="p-4 rounded-xl border-2 border-gray-200 bg-white">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Target className="w-4 h-4 text-orange-600" />
-                      <h4 className="text-xs text-orange-900">Confusion Matrix: Disruption Classifier</h4>
-                    </div>
-                    <div className="flex flex-col items-center" style={{ height: 200 }}>
-                      <div className="flex-1 flex items-center">
-                        <div className="grid grid-cols-2 gap-2">
-                          {confusionMatrixData.map((cell, idx) => (
-                            <motion.div
-                              key={idx}
-                              whileHover={{ scale: 1.05 }}
-                              className={`w-24 h-24 flex items-center justify-center text-lg rounded-xl shadow-md transition-all ${
-                                cell.value > 100
-                                  ? 'text-white'
-                                  : cell.value > 40
-                                  ? 'text-white'
-                                  : cell.value > 20
-                                  ? 'text-gray-800'
-                                  : 'text-gray-800'
-                              }
-                              style={{
-                                backgroundColor: 
-                                  cell.value > 100 ? '#2d6b6a' :
-                                  cell.value > 40 ? '#64748b' :
-                                  cell.value > 20 ? '#cbd5e1' :
-                                  '#f0f9f9'
-                              }`}
-                            >
-                              {cell.label}
-                            </motion.div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="mt-3 text-center">
-                        <div className="flex justify-between text-[10px] text-gray-600 mb-1 w-52">
-                          <span>No Disruption</span>
-                          <span>Disruption</span>
-                        </div>
-                        <div className="text-[10px] text-gray-600">Predicted label</div>
-                      </div>
-                    </div>
-                  </div>
+                  <ConfusionMatrixWidget data={confusionMatrixData} />
                 </div>
               </Card>
             </motion.div>

@@ -7,11 +7,13 @@ import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Download, Trash2, FileSpreadsheet, File, FileText, Folder, Clock, CheckCircle, Fish, Wheat, Apple, Milk, Activity } from 'lucide-react';
 import { motion } from 'motion/react';
+import { BackToUseCasesButton } from './BackToUseCasesButton';
 
 type ReportSector = 'fish' | 'aquaculture' | 'grain' | 'fruits' | 'dairy';
 
 interface ReportsPageProps {
   initialSector?: ReportSector;
+  onBackToUseCases?: () => void;
 }
 
 interface FileItem {
@@ -67,7 +69,7 @@ const initialFiles: FileItem[] = [
   },
 ];
 
-export default function ReportsPage({ initialSector = 'fish' }: ReportsPageProps) {
+export default function ReportsPage({ initialSector = 'fish', onBackToUseCases }: ReportsPageProps) {
   const [files, setFiles] = useState<FileItem[]>(initialFiles);
   const [activeTab, setActiveTab] = useState('files');
   const [selectedSector, setSelectedSector] = useState<ReportSector>(initialSector);
@@ -128,6 +130,13 @@ export default function ReportsPage({ initialSector = 'fish' }: ReportsPageProps
       <div className="max-w-[1800px] mx-auto">
         {/* Header */}
         <div className="mb-6">
+          {/* Back Button */}
+          {onBackToUseCases && (
+            <div className="mb-4">
+              <BackToUseCasesButton onClick={onBackToUseCases} />
+            </div>
+          )}
+          
           {/* Current Sector Indicator */}
           <div className="flex items-center gap-4 mb-4">
             <div 
@@ -214,14 +223,14 @@ export default function ReportsPage({ initialSector = 'fish' }: ReportsPageProps
               <TabsList className="bg-transparent border-b-0 h-auto p-0 w-full justify-start">
                 <TabsTrigger
                   value="files"
-                  className="data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70 border-b-4 border-transparent data-[state=active]:border-white rounded-none px-8 py-4 transition-all duration-300 backdrop-blur-sm"
+                  className="data-[state=active]:bg-white data-[state=active]:text-teal-700 text-white/80 border-b-0 rounded-t-lg px-8 py-4 transition-all duration-300 data-[state=active]:shadow-lg"
                 >
                   <FileText className="w-4 h-4 mr-2" />
                   Files
                 </TabsTrigger>
                 <TabsTrigger
                   value="download-template"
-                  className="data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70 border-b-4 border-transparent data-[state=active]:border-white rounded-none px-8 py-4 backdrop-blur-sm"
+                  className="data-[state=active]:bg-white data-[state=active]:text-teal-700 text-white/80 border-b-0 rounded-t-lg px-8 py-4 transition-all duration-300 data-[state=active]:shadow-lg"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Download template

@@ -27,7 +27,6 @@ interface SavedSimulation {
 interface SimulationComparisonPanelProps {
   savedSimulations: SavedSimulation[];
   selectedSimulations: string[];
-  showComparison: boolean;
   onDelete: (id: string) => void;
   onDuplicate: (simulation: SavedSimulation) => void;
   onToggleSelection: (id: string) => void;
@@ -45,7 +44,6 @@ const sectors = [
 export function SavedSimulationsPanel({ 
   savedSimulations, 
   selectedSimulations, 
-  showComparison,
   onDelete, 
   onDuplicate, 
   onToggleSelection 
@@ -80,7 +78,7 @@ export function SavedSimulationsPanel({
                     ? 'border-teal-500 bg-teal-50 shadow-md' 
                     : 'border-gray-200 bg-white hover:border-teal-300 hover:shadow-sm'
                 }`}
-                onClick={() => showComparison && onToggleSelection(sim.id)}
+                onClick={() => onToggleSelection(sim.id)}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
@@ -134,15 +132,13 @@ export function SavedSimulationsPanel({
                   </div>
                 </div>
 
-                {showComparison && (
-                  <div className={`text-[10px] text-center py-1.5 rounded-lg ${
-                    isSelected 
-                      ? 'bg-teal-600 text-white' 
-                      : 'bg-gray-100 text-gray-500'
-                  }`}>
-                    {isSelected ? '✓ Selected for comparison' : 'Click to compare'}
-                  </div>
-                )}
+                <div className={`text-[10px] text-center py-1.5 rounded-lg ${
+                  isSelected 
+                    ? 'bg-teal-600 text-white' 
+                    : 'bg-gray-100 text-gray-500'
+                }`}>
+                  {isSelected ? '✓ Selected for comparison' : 'Click to compare'}
+                </div>
               </motion.div>
             );
           })}

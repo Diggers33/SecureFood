@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Tooltip as UITooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
-import { ArrowLeft, Truck, Package, Apple, Store, Users, Factory, Warehouse, TrendingUp, TrendingDown, Thermometer, Clock, Droplets, AlertTriangle, Sun, CloudRain } from 'lucide-react';
+import { Truck, Package, Apple, Store, Users, Factory, Warehouse, TrendingUp, TrendingDown, Thermometer, Clock } from 'lucide-react';
 import { motion } from 'motion/react';
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { BackToUseCasesButton } from './BackToUseCasesButton';
 
 type NodeType = 'farm' | 'bulk-transport' | 'processing' | 'packaging' | 
   'wholesale' | 'logistics' | 'retailer' | 'consumers';
@@ -249,10 +248,9 @@ const wasteTrendData = [
   { name: 'Dec', value: 5.2 },
 ];
 
-export default function FruitVegetablesCaseStudy({ onBack }: { onBack?: () => void }) {
+export default function FruitVegetablesCaseStudy({ onBackToUseCases }: { onBackToUseCases?: () => void }) {
   const [hoveredNode, setHoveredNode] = useState<NodeType | null>(null);
   const [selectedNode, setSelectedNode] = useState<NodeType | null>(null);
-  const [showDroughtStudy, setShowDroughtStudy] = useState(false);
 
   const getNodeById = (id: NodeType) => nodes.find(n => n.id === id);
 
@@ -260,16 +258,11 @@ export default function FruitVegetablesCaseStudy({ onBack }: { onBack?: () => vo
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-[1800px] mx-auto p-6">
         {/* Back Button */}
-        <div className="mb-6">
-          <Button
-            variant="outline"
-            onClick={onBack ? onBack : () => window.location.reload()}
-            className="gap-2 h-10 text-sm hover:bg-teal-50 hover:border-teal-300 transition-all shadow-sm"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Use Cases
-          </Button>
-        </div>
+        {onBackToUseCases && (
+          <div className="mb-6">
+            <BackToUseCasesButton onClick={onBackToUseCases} />
+          </div>
+        )}
 
         {/* Header */}
         <div className="mb-6">
@@ -289,50 +282,11 @@ export default function FruitVegetablesCaseStudy({ onBack }: { onBack?: () => vo
           <p className="text-gray-600 text-sm mb-4">
             Interactive visualization of the Portuguese fresh produce supply chain - hover over nodes for details
           </p>
-
-          {/* Controls */}
-          <div className="flex items-center gap-3 mb-4">
-            <UITooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={showDroughtStudy ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setShowDroughtStudy(!showDroughtStudy)}
-                  className={`h-10 text-sm transition-all duration-300 ${
-                    showDroughtStudy 
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-md scale-105' 
-                      : 'hover:bg-orange-50 hover:border-orange-300'
-                  }`}
-                >
-                  <Droplets className="w-4 h-4 mr-2" />
-                  {showDroughtStudy ? 'Hide' : 'Show'} Drought Study Focus
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="max-w-xs bg-orange-800 text-white p-3 shadow-2xl">
-                <p className="text-xs leading-relaxed">
-                  Click to reveal the drought impact analysis for Portuguese agriculture, showing effects on crop yield, irrigation requirements, and quality concerns in affected regions.
-                </p>
-              </TooltipContent>
-            </UITooltip>
-          </div>
         </div>
 
         {/* Supply Chain Diagram */}
         <Card className="p-8 bg-white/90 backdrop-blur-sm shadow-2xl border-2 border-teal-100 overflow-visible relative z-50">
           <div className="relative overflow-visible pb-64" style={{ height: '440px' }}>
-            {/* Study Focus Box - Drought Impact Zone */}
-            {showDroughtStudy && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="absolute left-8 top-16 w-[540px] h-[260px] border-4 border-dashed border-orange-400 rounded-xl bg-orange-50/30 pointer-events-none"
-              >
-                <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-orange-100 rounded-full border-2 border-orange-300">
-                  <span className="text-xs text-orange-700">🌡️ Study Focus: Drought Impact Zone</span>
-                </div>
-              </motion.div>
-            )}
-
             {/* SVG for connections */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 5 }}>
               <defs>
@@ -559,55 +513,6 @@ export default function FruitVegetablesCaseStudy({ onBack }: { onBack?: () => vo
             })}
           </div>
         </Card>
-
-        {/* Drought Impact Analysis */}
-        {showDroughtStudy && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-6"
-          >
-            <Card className="p-6 bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 border-2 border-orange-200 shadow-xl">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <Droplets className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg mb-3 text-orange-900">Drought Impact & Climate Analysis</h3>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-orange-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Sun className="w-4 h-4 text-orange-600" />
-                        <h4 className="text-sm text-gray-800">Crop Yield Reduction</h4>
-                      </div>
-                      <p className="text-xs text-gray-600 leading-relaxed">
-                        Extended dry periods reducing harvest volumes by 15-20% in southern growing regions, affecting farm output and quality grades.
-                      </p>
-                    </div>
-                    <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-orange-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Droplets className="w-4 h-4 text-orange-600" />
-                        <h4 className="text-sm text-gray-800">Irrigation Challenges</h4>
-                      </div>
-                      <p className="text-xs text-gray-600 leading-relaxed">
-                        Water scarcity increasing irrigation costs and operational complexity, forcing farms to prioritize high-value crops.
-                      </p>
-                    </div>
-                    <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-orange-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <AlertTriangle className="w-4 h-4 text-orange-600" />
-                        <h4 className="text-sm text-gray-800">Quality Concerns</h4>
-                      </div>
-                      <p className="text-xs text-gray-600 leading-relaxed">
-                        Heat stress and irregular rainfall patterns affecting produce quality, shelf life, and consumer satisfaction metrics.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-        )}
 
         {/* Metrics and Trends */}
         <div className="grid grid-cols-4 gap-4 mt-6">

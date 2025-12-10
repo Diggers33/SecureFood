@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { BackToUseCasesButton } from './BackToUseCasesButton';
 
 type NodeType = 'fingerlings' | 'transport1' | 'aquaculture' | 'primary-processing' | 
   'transport2' | 'retail' | 'consumers1' | 'secondary-processing' | 'bigh' | 
@@ -336,7 +337,7 @@ const harvestTrendData = [
   { name: 'Dec', value: 170 },
 ];
 
-export default function FishCaseStudy({ onBack }: { onBack?: () => void }) {
+export default function FishCaseStudy({ onBackToUseCases }: { onBackToUseCases?: () => void }) {
   const [hoveredNode, setHoveredNode] = useState<NodeType | null>(null);
   const [selectedNode, setSelectedNode] = useState<NodeType | null>(null);
   const [selectedPath, setSelectedPath] = useState<'export' | 'domestic' | 'feed' | null>(null);
@@ -361,16 +362,11 @@ export default function FishCaseStudy({ onBack }: { onBack?: () => void }) {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-[1800px] mx-auto p-6">
         {/* Back Button */}
-        <div className="mb-6">
-          <Button
-            variant="outline"
-            onClick={onBack ? onBack : () => window.location.reload()}
-            className="gap-2 h-10 text-sm hover:bg-teal-50 hover:border-teal-300 transition-all shadow-sm"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Use Cases
-          </Button>
-        </div>
+        {onBackToUseCases && (
+          <div className="mb-6">
+            <BackToUseCasesButton onClick={onBackToUseCases} />
+          </div>
+        )}
 
         {/* Header */}
         <div className="mb-6">

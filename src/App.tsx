@@ -126,18 +126,18 @@ export default function App() {
           activeMenu === 'Dashboard' ? (
             // Dashboard shows the case study landing page
             selectedUseCase === 1 ? (
-              <GrainCaseStudy onBack={handleBackToUseCases} />
+              <GrainCaseStudy onBackToUseCases={handleBackToUseCases} />
             ) : selectedUseCase === 2 ? (
-              <FruitVegetablesCaseStudy onBack={handleBackToUseCases} />
+              <FruitVegetablesCaseStudy onBackToUseCases={handleBackToUseCases} />
             ) : selectedUseCase === 3 ? (
-              <FishCaseStudy onBack={handleBackToUseCases} />
+              <FishCaseStudy onBackToUseCases={handleBackToUseCases} />
             ) : null
           ) : activeMenu === 'Monitoring' ? (
-            <MonitoringPage initialSector={useCaseToSector(selectedUseCase)} />
+            <MonitoringPage initialSector={useCaseToSector(selectedUseCase)} onBackToUseCases={handleBackToUseCases} />
           ) : activeMenu === 'Simulations' ? (
-            <SimulationsPage initialSector={useCaseToSector(selectedUseCase)} />
+            <SimulationsPage initialSector={useCaseToSector(selectedUseCase)} onBackToUseCases={handleBackToUseCases} />
           ) : activeMenu === 'Reports' ? (
-            <ReportsPage initialSector={useCaseToSector(selectedUseCase)} />
+            <ReportsPage initialSector={useCaseToSector(selectedUseCase)} onBackToUseCases={handleBackToUseCases} />
           ) : null
         ) : (
           // No use case selected - show Screen0

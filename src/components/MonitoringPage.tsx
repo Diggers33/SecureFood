@@ -1,31 +1,10 @@
 import { useState } from 'react';
-import { Card } from './ui/card';
-import { Badge } from './ui/badge';
-import { Button } from './ui/button';
-import { 
-  TrendingUp, 
-  TrendingDown,
-  Thermometer,
-  Droplet,
-  Fish,
-  Wheat,
-  Apple,
-  Milk,
-  Truck,
-  DollarSign,
-  Package,
-  Activity,
-  CheckCircle,
-  CloudRain,
-  Wind,
-  BarChart3,
-  Zap,
-  MapPin,
-  Clock
-} from 'lucide-react';
-import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { motion } from 'motion/react';
 import OtherSectorMonitoring from './OtherSectorMonitoring';
+import { BackToUseCasesButton } from './BackToUseCasesButton';
+import { Card } from './ui/card';
+import { Fish, Activity, Wheat, Apple, Milk, Clock, TrendingUp, TrendingDown, Thermometer, Droplet, BarChart3, DollarSign, Truck, MapPin } from 'lucide-react';
+import { LineChart, Line, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 // Sample data for Fish monitoring
 const fishEnvironmentalData = [
@@ -114,11 +93,12 @@ type MonitoringSector = 'fish' | 'aquaculture' | 'grain' | 'fruits' | 'dairy';
 
 interface MonitoringPageProps {
   initialSector?: MonitoringSector;
+  onBackToUseCases?: () => void;
 }
 
-export default function MonitoringPage({ initialSector = 'fish' }: MonitoringPageProps) {
+export default function MonitoringPage({ initialSector = 'fish', onBackToUseCases }: MonitoringPageProps) {
   const [selectedSector, setSelectedSector] = useState<MonitoringSector>(initialSector);
-  const [timeRange, setTimeRange] = useState('24h');
+  const [timeRange, setTimeRange] = useState('14d');
 
   const sectors = [
     { id: 'fish' as MonitoringSector, name: 'Fish - Greece', icon: Fish, color: 'blue', gradient: 'from-blue-500 to-cyan-600' },
@@ -136,10 +116,12 @@ export default function MonitoringPage({ initialSector = 'fish' }: MonitoringPag
       <div className="max-w-[1800px] mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white shadow-sm rounded-full mb-4 border border-teal-200">
-            <Activity className="w-4 h-4 text-teal-600" />
-            <span className="text-sm text-teal-700">Real-Time Analytics</span>
-          </div>
+          {/* Back Button */}
+          {onBackToUseCases && (
+            <div className="mb-4">
+              <BackToUseCasesButton onClick={onBackToUseCases} />
+            </div>
+          )}
           
           {/* Current Sector Indicator */}
           <div className="flex items-center gap-4 mb-4">
@@ -161,7 +143,7 @@ export default function MonitoringPage({ initialSector = 'fish' }: MonitoringPag
         <div className="mb-6 flex gap-3 items-center bg-white/80 backdrop-blur-sm p-4 rounded-2xl shadow-lg border border-gray-100 w-fit">
           <Clock className="w-4 h-4 text-gray-500" />
           <span className="text-sm text-gray-700">Time Range:</span>
-          {['24h', '7d', '30d', '90d'].map((range) => (
+          {['14d', '30d', '90d', '120d'].map((range) => (
             <motion.button
               key={range}
               whileHover={{ scale: 1.05 }}

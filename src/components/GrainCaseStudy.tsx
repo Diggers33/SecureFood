@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { BackToUseCasesButton } from './BackToUseCasesButton';
 
 type NodeType = 'farm' | 'logistics' | 'elevator-sea' | 'elevator-field' | 'ship' | 
   'foreign' | 'mills' | 'packaging' | 'distribution' | 'retailer' | 'consumer' | 
@@ -353,7 +354,7 @@ const paths = {
   feed: ['farm', 'logistics', 'elevator-field', 'mills', 'feed-mills', 'livestock'],
 };
 
-export default function GrainCaseStudy({ onBack }: { onBack?: () => void }) {
+export default function GrainCaseStudy({ onBackToUseCases }: { onBackToUseCases?: () => void }) {
   const [hoveredNode, setHoveredNode] = useState<NodeType | null>(null);
   const [selectedNode, setSelectedNode] = useState<NodeType | null>(null);
   const [selectedPath, setSelectedPath] = useState<'export' | 'domestic' | 'feed' | null>(null);
@@ -425,16 +426,11 @@ export default function GrainCaseStudy({ onBack }: { onBack?: () => void }) {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-[1800px] mx-auto p-6">
         {/* Back Button */}
-        <div className="mb-6">
-          <Button
-            variant="outline"
-            onClick={onBack ? onBack : () => window.location.reload()}
-            className="gap-2 h-10 text-sm hover:bg-teal-50 hover:border-teal-300 transition-all shadow-sm"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Use Cases
-          </Button>
-        </div>
+        {onBackToUseCases && (
+          <div className="mb-6">
+            <BackToUseCasesButton onClick={onBackToUseCases} />
+          </div>
+        )}
 
         {/* Header */}
         <div className="mb-6">
@@ -501,7 +497,7 @@ export default function GrainCaseStudy({ onBack }: { onBack?: () => void }) {
         </div>
 
         {/* Supply Chain Diagram */}
-        <Card className="p-8 bg-white/90 backdrop-blur-sm shadow-2xl border-2 border-teal-100 overflow-hidden relative z-50">
+        <Card className="p-8 bg-white/90 backdrop-blur-sm shadow-2xl border-2 border-teal-100 overflow-visible relative z-50">
           {/* Zoom Controls */}
           <div className="absolute top-4 right-4 z-[100] flex gap-2 bg-white/90 backdrop-blur-sm p-2 rounded-xl shadow-lg border border-teal-200">
             <Button
