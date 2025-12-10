@@ -1104,7 +1104,7 @@ export default function SimulationsPage({ initialSector = 'fish', onBackToUseCas
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", duration: 0.3 }}
           >
-            <Card className="p-8 max-w-md w-full mx-4 shadow-2xl border-2 border-purple-200">
+            <Card className="p-8 max-w-md w-full mx-4 shadow-2xl border-2 border-purple-200 bg-white">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                   <Upload className="w-6 h-6 text-white" />
@@ -1204,7 +1204,7 @@ export default function SimulationsPage({ initialSector = 'fish', onBackToUseCas
             transition={{ type: "spring", duration: 0.3 }}
             className="w-full max-w-md"
           >
-            <Card className="p-8 shadow-2xl border-2 border-gray-200">
+            <Card className="p-8 shadow-2xl border-2 border-gray-200 bg-white">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg" style={{ backgroundColor: '#2d6b6a' }}>
                   <PlayCircle className="w-6 h-6 text-white" />
